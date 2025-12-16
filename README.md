@@ -1,14 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 제주 해양환경 예측 서비스
+
+제주도 주변 해양환경 데이터를 시각화하는 웹 애플리케이션입니다.
+
+## 주요 기능
+
+- 🗺️ Mapbox 기반 인터랙티브 지도
+- 📊 해양환경 데이터 시각화 (막대 그래프)
+- 🎯 데이터 필터링 (전체/낮음/보통/높음)
+- 📱 반응형 디자인
 
 ## Getting Started
 
-First, run the development server:
+### 1. 의존성 설치
+
+```bash
+npm install
+```
+
+### 2. 환경변수 설정
+
+`.env.local` 파일을 생성하고 Mapbox 토큰을 설정하세요:
+
+```env
+NEXT_PUBLIC_MAPBOX_TOKEN=your_mapbox_token_here
+```
+
+Mapbox 토큰은 [https://account.mapbox.com/](https://account.mapbox.com/)에서 무료로 발급받을 수 있습니다.
+
+### 3. 개발 서버 실행
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
 pnpm dev
 # or
 bun dev
