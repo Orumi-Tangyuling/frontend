@@ -28,7 +28,9 @@ const oceanData: DataPoint[] = [
 export default function JejuOceanMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+  const markers = useRef<mapboxgl.Marker[]>([]);
   const [filter, setFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
     if (!mapContainer.current || map.current) return;
@@ -43,27 +45,27 @@ export default function JejuOceanMap() {
     });
 
     map.current.on('load', () => {
-      // 마커 추가
-      addMarkers();
+      setMapLoaded(true);
     });
 
     return () => {
+      markers.current.forEach(marker => marker.remove());
       map.current?.remove();
     };
   }, []);
 
   useEffect(() => {
-    if (map.current) {
+    if (mapLoaded && map.current) {
       addMarkers();
     }
-  }, [filter]);
+  }, [filter, mapLoaded]);
 
   const addMarkers = () => {
-    if (!map.current) return;
+    if (!map.current || !mapLoaded) return;
 
     // 기존 마커 제거
-    const existingMarkers = document.querySelectorAll('.custom-marker');
-    existingMarkers.forEach(marker => marker.remove());
+    markers.current.forEach(marker => marker.remove());
+    markers.current = [];
 
     const filteredData = oceanData.filter(point => {
       if (filter === 'all') return true;
@@ -110,7 +112,7 @@ export default function JejuOceanMap() {
         "></div>
       `;
 
-      new mapboxgl.Marker(el)
+      const marker = new mapboxgl.Marker(el)
         .setLngLat([point.lng, point.lat])
         .setPopup(
           new mapboxgl.Popup({ offset: 25 })
@@ -122,6 +124,8 @@ export default function JejuOceanMap() {
             `)
         )
         .addTo(map.current!);
+      
+      markers.current.push(marker);
     });
   };
 
