@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
@@ -13,8 +15,7 @@ export default function LoginPage() {
     e.preventDefault();
     // 로그인 로직 구현
     console.log('Login attempt:', { username, password, keepLoggedIn });
-    // 임시로 바로 관리자 페이지로 이동
-    window.location.href = '/admin';
+    router.push('/admin');
   };
 
   return (
