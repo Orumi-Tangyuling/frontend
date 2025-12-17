@@ -130,7 +130,7 @@ export default function JejuOceanMap() {
   };
 
   return (
-    <div className="relative w-full h-full">
+    <div className="absolute inset-0 w-full h-full">
       {/* 필터 버튼 */}
       <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-10 flex gap-2">
         <button
@@ -176,7 +176,7 @@ export default function JejuOceanMap() {
       </div>
 
       {/* 지도 컨테이너 */}
-      <div ref={mapContainer} className="w-full h-full" />
+      <div ref={mapContainer} className="absolute inset-0 w-full h-full" style={{ minHeight: '500px' }} />
     </div>
   );
 }
