@@ -16,17 +16,17 @@ interface DataPoint {
 }
 
 const oceanData: DataPoint[] = [
-  { id: '1', name: '애월해안', lat: 33.4672, lng: 126.3119, value: 140, level: 'high' },
-  { id: '2', name: '조천해안', lat: 33.5440, lng: 126.7180, value: 114, level: 'high' },
-  { id: '3', name: '예래해안', lat: 33.2526, lng: 126.2516, value: 87, level: 'high' },
-  { id: '4', name: '한림해안', lat: 33.3960, lng: 126.2400, value: 53, level: 'medium' },
-  { id: '5', name: '성산해안', lat: 33.4525, lng: 126.9246, value: 115, level: 'high' },
-  { id: '6', name: '중문해안', lat: 33.2474, lng: 126.4133, value: 73, level: 'medium' },
-  { id: '7', name: '구좌해안', lat: 33.5314, lng: 126.9885, value: 95, level: 'high' },
-  { id: '8', name: '표선해안', lat: 33.3567, lng: 126.9136, value: 68, level: 'medium' },
-  { id: '9', name: '안덕해안', lat: 33.2520, lng: 126.2520, value: 82, level: 'high' },
-  { id: '10', name: '남원해안', lat: 33.2540, lng: 126.6440, value: 45, level: 'medium' },
-  { id: '11', name: '대정해안', lat: 33.1928, lng: 126.2380, value: 59, level: 'medium' },
+  { id: '1', name: '애월해안', lat: 33.44639, lng: 126.29343, value: 140, level: 'high' },
+  { id: '2', name: '조천해안', lat: 33.54323, lng: 126.66986, value: 114, level: 'high' },
+  { id: '3', name: '예래해안', lat: 33.22843, lng: 126.47737, value: 87, level: 'high' },
+  { id: '4', name: '한림해안', lat: 33.39511, lng: 126.24028, value: 53, level: 'medium' },
+  { id: '5', name: '성산해안', lat: 33.47330, lng: 126.93454, value: 115, level: 'high' },
+  { id: '6', name: '중문해안', lat: 33.24421, lng: 126.41406, value: 73, level: 'medium' },
+  { id: '7', name: '구좌해안', lat: 33.55565, lng: 126.79566, value: 95, level: 'high' },
+  { id: '8', name: '표선해안', lat: 33.32585, lng: 126.84252, value: 68, level: 'medium' },
+  { id: '9', name: '안덕해안', lat: 33.23000, lng: 126.29500, value: 82, level: 'high' },
+  { id: '10', name: '남원해안', lat: 33.27262, lng: 126.66034, value: 45, level: 'medium' },
+  { id: '11', name: '대정해안', lat: 33.21641, lng: 126.25031, value: 59, level: 'medium' },
 ];
 
 export default function JejuOceanMap() {
@@ -44,8 +44,8 @@ export default function JejuOceanMap() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/dark-v11',
-      center: [126.5312, 33.4996],
-      zoom: 9.5,
+      center: [126.5312, 33.3800],
+      zoom: 9.8,
     });
 
     map.current.on('load', () => {
