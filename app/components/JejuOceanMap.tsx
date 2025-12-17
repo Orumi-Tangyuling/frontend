@@ -16,17 +16,17 @@ interface DataPoint {
 }
 
 const oceanData: DataPoint[] = [
-  { id: '1', name: '애월해안', lat: 33.4621, lng: 126.3192, value: 140, level: 'high' },
-  { id: '2', name: '조천해안', lat: 33.5430, lng: 126.6431, value: 114, level: 'high' },
-  { id: '3', name: '애월읍안', lat: 33.4621, lng: 126.3192, value: 87, level: 'high' },
-  { id: '4', name: '안덕면안', lat: 33.2547, lng: 126.3889, value: 53, level: 'medium' },
-  { id: '5', name: '한경면안', lat: 33.3532, lng: 126.2345, value: 115, level: 'high' },
-  { id: '6', name: '중문읍안', lat: 33.2546, lng: 126.4167, value: 73, level: 'medium' },
-  { id: '7', name: '구좌읍안', lat: 33.5441, lng: 126.8342, value: 95, level: 'high' },
-  { id: '8', name: '표선면안', lat: 33.3236, lng: 126.8365, value: 68, level: 'medium' },
-  { id: '9', name: '인력읍안', lat: 33.4084, lng: 126.2706, value: 82, level: 'high' },
-  { id: '10', name: '남원읍안', lat: 33.2830, lng: 126.7130, value: 45, level: 'medium' },
-  { id: '11', name: '대정읍안', lat: 33.2127, lng: 126.2581, value: 59, level: 'medium' },
+  { id: '1', name: '애월해안', lat: 33.4672, lng: 126.3119, value: 140, level: 'high' },
+  { id: '2', name: '조천해안', lat: 33.5440, lng: 126.7180, value: 114, level: 'high' },
+  { id: '3', name: '예래해안', lat: 33.2526, lng: 126.2516, value: 87, level: 'high' },
+  { id: '4', name: '한림해안', lat: 33.3960, lng: 126.2400, value: 53, level: 'medium' },
+  { id: '5', name: '성산해안', lat: 33.4525, lng: 126.9246, value: 115, level: 'high' },
+  { id: '6', name: '중문해안', lat: 33.2474, lng: 126.4133, value: 73, level: 'medium' },
+  { id: '7', name: '구좌해안', lat: 33.5314, lng: 126.9885, value: 95, level: 'high' },
+  { id: '8', name: '표선해안', lat: 33.3567, lng: 126.9136, value: 68, level: 'medium' },
+  { id: '9', name: '안덕해안', lat: 33.2520, lng: 126.2520, value: 82, level: 'high' },
+  { id: '10', name: '남원해안', lat: 33.2540, lng: 126.6440, value: 45, level: 'medium' },
+  { id: '11', name: '대정해안', lat: 33.1928, lng: 126.2380, value: 59, level: 'medium' },
 ];
 
 export default function JejuOceanMap() {
