@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-// Mapbox 토큰 설정
 mapboxgl.accessToken = 'pk.eyJ1IjoieW9uZ3dvb24iLCJhIjoiY21qNm93cXJlMGdyejNmcTJzMGVrZHNyZCJ9.MWEH1d2ExoNoykCYtndGGw';
 
 interface DataPoint {
@@ -17,12 +16,17 @@ interface DataPoint {
 }
 
 const oceanData: DataPoint[] = [
-  { id: '1', name: 'Hangyeong', lat: 33.3168, lng: 126.2339, value: 140, level: 'high' },
-  { id: '2', name: 'Gujwa', lat: 33.5545, lng: 126.9273, value: 114, level: 'high' },
-  { id: '3', name: 'Seogwipo', lat: 33.2541, lng: 126.5601, value: 87, level: 'high' },
-  { id: '4', name: 'Pyoseon', lat: 33.3236, lng: 126.8365, value: 53, level: 'medium' },
-  { id: '5', name: 'Seongsan', lat: 33.0956, lng: 126.6816, value: 73, level: 'medium' },
-  { id: '6', name: 'Hallim', lat: 33.4084, lng: 126.2706, value: 115, level: 'high' },
+  { id: '1', name: '애월해안', lat: 33.4621, lng: 126.3192, value: 140, level: 'high' },
+  { id: '2', name: '조천해안', lat: 33.5430, lng: 126.6431, value: 114, level: 'high' },
+  { id: '3', name: '애월읍안', lat: 33.4621, lng: 126.3192, value: 87, level: 'high' },
+  { id: '4', name: '안덕면안', lat: 33.2547, lng: 126.3889, value: 53, level: 'medium' },
+  { id: '5', name: '한경면안', lat: 33.3532, lng: 126.2345, value: 115, level: 'high' },
+  { id: '6', name: '중문읍안', lat: 33.2546, lng: 126.4167, value: 73, level: 'medium' },
+  { id: '7', name: '구좌읍안', lat: 33.5441, lng: 126.8342, value: 95, level: 'high' },
+  { id: '8', name: '표선면안', lat: 33.3236, lng: 126.8365, value: 68, level: 'medium' },
+  { id: '9', name: '인력읍안', lat: 33.4084, lng: 126.2706, value: 82, level: 'high' },
+  { id: '10', name: '남원읍안', lat: 33.2830, lng: 126.7130, value: 45, level: 'medium' },
+  { id: '11', name: '대정읍안', lat: 33.2127, lng: 126.2581, value: 59, level: 'medium' },
 ];
 
 export default function JejuOceanMap() {
@@ -33,15 +37,15 @@ export default function JejuOceanMap() {
   const [mapLoaded, setMapLoaded] = useState(false);
 
   useEffect(() => {
-    if (!mapContainer.current || map.current) return;
+    if (map.current) return;
 
-    // 지도 초기화
+    if (!mapContainer.current) return;
+
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/dark-v11',
       center: [126.5312, 33.4996],
       zoom: 9.5,
-      pitch: 0,
     });
 
     map.current.on('load', () => {
@@ -51,6 +55,7 @@ export default function JejuOceanMap() {
     return () => {
       markers.current.forEach(marker => marker.remove());
       map.current?.remove();
+      map.current = null;
     };
   }, []);
 
@@ -63,7 +68,6 @@ export default function JejuOceanMap() {
   const addMarkers = () => {
     if (!map.current || !mapLoaded) return;
 
-    // 기존 마커 제거
     markers.current.forEach(marker => marker.remove());
     markers.current = [];
 
@@ -176,7 +180,7 @@ export default function JejuOceanMap() {
       </div>
 
       {/* 지도 컨테이너 */}
-      <div ref={mapContainer} className="absolute inset-0 w-full h-full" style={{ minHeight: '500px' }} />
+      <div ref={mapContainer} className="absolute inset-0 w-full h-full" />
     </div>
   );
 }

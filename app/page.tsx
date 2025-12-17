@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import Image from "next/image";
+import Link from "next/link";
 
 const JejuOceanMap = dynamic(() => import('./components/JejuOceanMap'), {
   ssr: false,
@@ -32,9 +33,9 @@ export default function Home() {
         {/* 헤더 */}
         <header className="bg-gray-800 text-white px-8 py-4 flex items-center justify-between flex-shrink-0">
           <h1 className="text-2xl font-bold">제주 해양환경 예측 서비스</h1>
-          <button className="px-6 py-2 border border-white rounded hover:bg-gray-700 transition-colors">
+          <Link href="/login" className="px-6 py-2 border border-white rounded hover:bg-gray-700 transition-colors">
             로그인
-          </button>
+          </Link>
         </header>
 
         {/* 지도 영역 */}
