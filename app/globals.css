@@ -28,6 +28,26 @@
   border: none;
 }
 
+/* Mapbox Popup 스타일 커스터마이징 */
+.mapboxgl-popup {
+  max-width: 400px !important;
+}
+
+.mapboxgl-popup-content {
+  padding: 0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+  border: none !important;
+}
+
+.mapboxgl-popup-close-button {
+  display: none !important;
+}
+
+.mapboxgl-popup-tip {
+  display: none !important;
+}
+
 * {
   margin: 0;
   padding: 0;
