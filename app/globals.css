@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --background: #ffffff;
@@ -81,4 +81,3 @@ body {
 .custom-marker:hover {
   transform: scale(1.1);
 }
-
