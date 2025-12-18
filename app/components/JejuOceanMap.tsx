@@ -196,6 +196,54 @@ export default function JejuOceanMap() {
       }
     });
 
+    // 지역명 라벨 레이어 추가
+    const labelFeatures = filteredData.map(point => ({
+      type: 'Feature' as const,
+      geometry: {
+        type: 'Point' as const,
+        coordinates: [point.lng, point.lat]
+      },
+      properties: {
+        name: point.name,
+        level: point.level
+      }
+    }));
+
+    // 기존 라벨 레이어 제거
+    if (map.current.getLayer('ocean-labels')) {
+      map.current.removeLayer('ocean-labels');
+    }
+    if (map.current.getSource('ocean-label-source')) {
+      map.current.removeSource('ocean-label-source');
+    }
+
+    map.current.addSource('ocean-label-source', {
+      type: 'geojson',
+      data: {
+        type: 'FeatureCollection',
+        features: labelFeatures
+      }
+    });
+
+    map.current.addLayer({
+      id: 'ocean-labels',
+      type: 'symbol',
+      source: 'ocean-label-source',
+      layout: {
+        'text-field': ['get', 'name'],
+        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+        'text-size': 13,
+        'text-offset': [0, 2],
+        'text-anchor': 'top'
+      },
+      paint: {
+        'text-color': '#ffffff',
+        'text-halo-color': '#000000',
+        'text-halo-width': 2,
+        'text-halo-blur': 1
+      }
+    });
+
     // 클릭 이벤트 추가
     map.current.on('click', 'ocean-3d-circles', (e) => {
       if (e.features && e.features.length > 0) {
@@ -283,75 +331,85 @@ export default function JejuOceanMap() {
       {selectedPoint && (
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" onClick={() => setSelectedPoint(null)}>
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full m-4" onClick={(e) => e.stopPropagation()}>
-            <div className="relative p-6">
+            <div className="relative p-10">
               {/* 닫기 버튼 */}
               <button
                 onClick={() => setSelectedPoint(null)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="2" strokeLinecap="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="2" strokeLinecap="round">
                   <line x1="18" y1="6" x2="6" y2="18"></line>
                   <line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
               </button>
 
-              <h3 className="text-2xl font-bold text-gray-800 mb-4 pr-8">{selectedPoint.name}</h3>
+              <h3 className="text-2xl font-bold text-gray-800 mb-6 pr-12">{selectedPoint.name}</h3>
               
-              <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-4 ${
+              <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-full text-base font-bold mb-6 ${
                 selectedPoint.level === 'high' ? 'bg-green-500 text-white' : 
                 selectedPoint.level === 'medium' ? 'bg-yellow-500 text-white' : 
                 'bg-blue-500 text-white'
               }`}>
-                <svg width="16" height="16" viewBox="0 0 20 20" fill="white">
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="white">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
                 </svg>
                 {selectedPoint.level === 'high' ? '청정' : selectedPoint.level === 'medium' ? '양호' : '주의'}
               </div>
 
-              <div className={`p-4 rounded-xl mb-4 flex items-center justify-center ${
-                selectedPoint.swimStatus === 'prohibited' ? 'bg-red-50' :
-                selectedPoint.swimStatus === 'caution' ? 'bg-yellow-50' :
-                'bg-green-50'
-              }`}>
+              <div className="p-6 rounded-xl mb-6 flex items-center justify-center bg-gray-50">
                 {selectedPoint.swimStatus === 'prohibited' ? (
-                  <svg width="60" height="40" viewBox="0 0 60 40" style={{opacity: 0.7}}>
-                    <rect x="5" y="15" width="50" height="10" rx="5" fill="#9ca3af" stroke="#6b7280" strokeWidth="2"/>
-                    <circle cx="30" cy="10" r="4" fill="#6b7280"/>
-                    <path d="M20 20 L15 30 M40 20 L45 30" stroke="#6b7280" strokeWidth="2"/>
-                    <line x1="10" y1="5" x2="50" y2="35" stroke="#ef4444" strokeWidth="3"/>
-                    <line x1="50" y1="5" x2="10" y2="35" stroke="#ef4444" strokeWidth="3"/>
+                  <svg width="120" height="80" viewBox="0 0 120 80" style={{opacity: 0.8}}>
+                    <rect x="10" y="30" width="100" height="20" rx="10" fill="#9ca3af" stroke="#6b7280" strokeWidth="3"/>
+                    <circle cx="60" cy="20" r="8" fill="#6b7280"/>
+                    <path d="M40 40 L30 60 M80 40 L90 60" stroke="#6b7280" strokeWidth="3"/>
+                    <line x1="20" y1="10" x2="100" y2="70" stroke="#ef4444" strokeWidth="5" strokeLinecap="round"/>
+                    <line x1="100" y1="10" x2="20" y2="70" stroke="#ef4444" strokeWidth="5" strokeLinecap="round"/>
                   </svg>
                 ) : selectedPoint.swimStatus === 'caution' ? (
-                  <svg width="40" height="40" viewBox="0 0 40 40">
-                    <circle cx="20" cy="20" r="18" fill="#fbbf24" stroke="#f59e0b" strokeWidth="2"/>
-                    <path d="M20 10 L20 22" stroke="white" strokeWidth="3" strokeLinecap="round"/>
-                    <circle cx="20" cy="28" r="2" fill="white"/>
+                  <svg width="60" height="60" viewBox="0 0 60 60">
+                    <circle cx="30" cy="30" r="26" fill="#fbbf24" stroke="#f59e0b" strokeWidth="3"/>
+                    <path d="M30 15 L30 33" stroke="white" strokeWidth="4" strokeLinecap="round"/>
+                    <circle cx="30" cy="42" r="3" fill="white"/>
                   </svg>
                 ) : (
-                  <svg width="60" height="40" viewBox="0 0 60 40">
-                    <path d="M15 20 Q20 15 25 20 Q30 15 35 20 Q40 15 45 20" stroke="#10b981" strokeWidth="2" fill="none"/>
-                    <circle cx="25" cy="10" r="3" fill="#10b981"/>
-                    <path d="M20 15 L15 25 M30 15 L35 25" stroke="#10b981" strokeWidth="2"/>
+                  <svg width="100" height="60" viewBox="0 0 100 60">
+                    <path d="M20 35 Q30 25 40 35 Q50 25 60 35 Q70 25 80 35" stroke="#10b981" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                    <circle cx="40" cy="15" r="5" fill="#10b981"/>
+                    <path d="M35 20 L25 40 M45 20 L55 40" stroke="#10b981" strokeWidth="3" strokeLinecap="round"/>
                   </svg>
                 )}
               </div>
 
-              <ul className="space-y-3">
-                <li className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-600">현재 상태:</span>
-                  <strong className="text-gray-900">{selectedPoint.status}</strong>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-2">
+                  <span className="text-gray-800 font-medium">•</span>
+                  <div>
+                    <span className="text-gray-600 font-medium">현재 상태: </span>
+                    <strong className="text-gray-900">{selectedPoint.status}</strong>
+                  </div>
                 </li>
-                <li className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-600">예상 쓰레기량:</span>
-                  <strong className="text-gray-900">{selectedPoint.value}kg <span className="text-gray-400 text-sm">(이번 주)</span></strong>
+                <li className="flex items-start gap-2">
+                  <span className="text-gray-800 font-medium">•</span>
+                  <div>
+                    <span className="text-gray-600 font-medium">예상 쓰레기량: </span>
+                    <strong className="text-gray-900">{selectedPoint.value}kg <span className="text-gray-500 text-sm">(이번 주)</span></strong>
+                  </div>
                 </li>
-                <li className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="text-gray-600">최근 수거일:</span>
-                  <strong className="text-gray-900">{selectedPoint.lastCollected}</strong>
+                <li className="flex items-start gap-2">
+                  <span className="text-gray-800 font-medium">•</span>
+                  <div>
+                    <span className="text-gray-600 font-medium">최근 수거일: </span>
+                    <strong className="text-gray-900">{selectedPoint.lastCollected}</strong>
+                  </div>
                 </li>
-                <li className="flex justify-between py-2">
-                  <span className="text-gray-600">수온 / 날씨:</span>
-                  <strong className="text-gray-900">{selectedPoint.temperature} / {selectedPoint.weather}</strong>
+                <li className="flex items-start gap-2">
+                  <span className="text-gray-800 font-medium">•</span>
+                  <div>
+                    <span className="text-gray-600 font-medium">수온: </span>
+                    <strong className="text-gray-900">{selectedPoint.temperature}</strong>
+                    <span className="text-gray-600 font-medium"> / 날씨: </span>
+                    <strong className="text-gray-900">{selectedPoint.weather}</strong>
+                  </div>
                 </li>
               </ul>
             </div>

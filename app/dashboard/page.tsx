@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import Image from "next/image";
 import Link from "next/link";
+import ChatBot from '../components/ChatBot';
 
 const JejuOceanMap = dynamic(() => import('../components/JejuOceanMap'), {
   ssr: false,
@@ -43,6 +44,9 @@ export default function DashboardPage() {
           <JejuOceanMap />
         </div>
       </main>
+      
+      {/* 챗봇 */}
+      <ChatBot type="user" />
     </div>
   );
 }
