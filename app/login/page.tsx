@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import Cookies from 'js-cookie';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -11,12 +12,56 @@ export default function LoginPage() {
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // 로그인 로직 구현
-    console.log('Login attempt:', { username, password, keepLoggedIn });
-    router.push('/admin');
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const apiHost = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:8000';
+      const response = await fetch(`${apiHost}/api/v1/user/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('아이디 또는 비밀번호가 올바르지 않습니다.');
+        }
+        throw new Error('로그인에 실패했습니다. 다시 시도해주세요.');
+      }
+
+      const data = await response.json();
+
+      // JWT를 쿠키에 저장
+      const cookieOptions = {
+        expires: keepLoggedIn ? 7 : undefined, // 7일 또는 세션 쿠키
+        path: '/',
+        secure: process.env.NODE_ENV === 'production', // HTTPS에서만 전송
+        sameSite: 'strict' as const,
+      };
+
+      Cookies.set('access_token', data.access_token, cookieOptions);
+      Cookies.set('token_type', data.token_type, cookieOptions);
+      Cookies.set('username', data.username, cookieOptions);
+
+      // dashboard로 이동
+      router.push('/dashboard');
+    } catch (err) {
+      console.error('로그인 오류:', err);
+      setError(err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -135,6 +180,26 @@ export default function LoginPage() {
             <h2 className="mb-8 text-center text-3xl font-bold">행정 로그인</h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* 에러 메시지 */}
+              {error && (
+                <div className="rounded-lg bg-red-50 p-4 text-sm text-red-800">
+                  <div className="flex">
+                    <svg
+                      className="h-5 w-5 text-red-400"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <span className="ml-3">{error}</span>
+                  </div>
+                </div>
+              )}
+
               {/* 아이디 입력 */}
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">아이디</label>
@@ -251,9 +316,35 @@ export default function LoginPage() {
               {/* 로그인 버튼 */}
               <button
                 type="submit"
-                className="w-full rounded-xl bg-gray-900 py-3 font-medium text-white transition-colors duration-200 hover:bg-gray-800"
+                disabled={isLoading}
+                className="w-full rounded-xl bg-gray-900 py-3 font-medium text-white transition-colors duration-200 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                로그인
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <svg
+                      className="h-5 w-5 animate-spin"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
+                    </svg>
+                    로그인 중...
+                  </span>
+                ) : (
+                  '로그인'
+                )}
               </button>
 
               {/* 비밀번호 찾기 / 계정 문의 */}
