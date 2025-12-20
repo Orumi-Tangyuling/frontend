@@ -1,0 +1,440 @@
+// 변수
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+$user-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1e40af 100%);
+$admin-gradient: linear-gradient(135deg, #6366f1 0%, #9333ea 50%, #7e22ce 100%);
+
+// 챗봇 버튼
+.chatButton {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 4rem;
+  width: 4rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  color: white;
+  box-shadow: 0 10px 40px rgba(59, 130, 246, 0.5), 0 0 20px rgba(6, 182, 212, 0.3);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  animation: float 3s ease-in-out infinite;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+  
+  svg {
+    transition: transform 0.3s ease;
+  }
+  
+  &:hover svg {
+    transform: scale(1.1);
+  }
+}
+
+// 알림 배지
+.notificationBadge {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  display: flex;
+  height: 1.25rem;
+  width: 1.25rem;
+  
+  .ping {
+    position: absolute;
+    display: inline-flex;
+    height: 100%;
+    width: 100%;
+    border-radius: 9999px;
+    background-color: rgb(248, 113, 113);
+    opacity: 0.75;
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  
+  .badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.25rem;
+    width: 1.25rem;
+    border-radius: 9999px;
+    background-color: rgb(239, 68, 68);
+    border: 2px solid white;
+    
+    span {
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: white;
+    }
+  }
+}
+
+// Shimmer 효과
+.shimmer {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.chatButton:hover .shimmer {
+  opacity: 1;
+  animation: shimmer 1.5s infinite;
+}
+
+// 챗봇 창
+.chatWindow {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  height: 640px;
+  width: 400px;
+  overflow: hidden;
+  border-radius: 1.5rem;
+  background: white;
+  box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+// 헤더
+.chatHeader {
+  position: relative;
+  padding: 1.75rem 2rem;
+  overflow: hidden;
+  color: white;
+  
+  &.user {
+    background: $user-gradient;
+  }
+  
+  &.admin {
+    background: $admin-gradient;
+  }
+}
+
+.headerPattern {
+  position: absolute;
+  inset: 0;
+  opacity: 0.1;
+  
+  .circle1 {
+    position: absolute;
+    top: -2.5rem;
+    right: -2.5rem;
+    height: 10rem;
+    width: 10rem;
+    border-radius: 9999px;
+    background-color: white;
+    filter: blur(2rem);
+  }
+  
+  .circle2 {
+    position: absolute;
+    bottom: -2.5rem;
+    left: -2.5rem;
+    height: 8rem;
+    width: 8rem;
+    border-radius: 9999px;
+    background-color: white;
+    filter: blur(2rem);
+  }
+}
+
+.headerContent {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.headerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  width: 2.5rem;
+  flex-shrink: 0;
+}
+
+.headerInfo {
+  flex: 1;
+  min-width: 0;
+  padding-right: 0.5rem;
+  
+  h3 {
+    margin-bottom: 0.25rem;
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  p {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+.onlineIndicator {
+  height: 0.5rem;
+  width: 0.5rem;
+  border-radius: 9999px;
+  background-color: rgb(74, 222, 128);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  width: 2.5rem;
+  flex-shrink: 0;
+  transition: $transition;
+  cursor: pointer;
+  
+  &:hover {
+    transform: scale(1.1) rotate(90deg);
+  }
+}
+
+// 메시지 영역
+.messagesArea {
+  flex: 1;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #f9fafb 0%, white 100%);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.messageWrapper {
+  display: flex;
+  animation: fadeInSlideUp 0.3s ease-out;
+  
+  &.user {
+    justify-content: flex-end;
+  }
+  
+  &.bot {
+    justify-content: flex-start;
+  }
+}
+
+.messageBubble {
+  max-width: 75%;
+  border-radius: 1rem;
+  padding: 0.875rem 1.25rem;
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.02);
+  }
+  
+  &.user {
+    background: $user-gradient;
+    color: white;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35), 0 2px 8px rgba(59, 130, 246, 0.2);
+  }
+  
+  &.bot {
+    background: rgba(255, 255, 255, 0.9);
+    color: rgb(31, 41, 55);
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(4px);
+  }
+  
+  p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+}
+
+.messageTime {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  
+  &.user {
+    color: rgba(191, 219, 254, 0.8);
+  }
+  
+  &.bot {
+    color: rgb(156, 163, 175);
+  }
+  
+  svg {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+}
+
+// 입력 영역
+.inputArea {
+  border-top: 1px solid rgb(243, 244, 246);
+  background-color: white;
+  padding: 1.25rem;
+}
+
+.inputContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.messageInput {
+  flex: 1;
+  border-radius: 9999px;
+  border: none;
+  background-color: rgb(243, 244, 246);
+  padding: 0.875rem 1.25rem;
+  font-size: 0.875rem;
+  transition: $transition;
+  outline: none;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+  
+  &::placeholder {
+    color: rgb(156, 163, 175);
+  }
+  
+  &:focus {
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    ring: 2px solid rgb(59, 130, 246);
+  }
+}
+
+.sendButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 3rem;
+  width: 3rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  transition: $transition;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+  
+  &.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #06b6d4 100%);
+    color: white;
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4), 0 0 12px rgba(6, 182, 212, 0.2);
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+    
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+  
+  &.disabled {
+    background-color: rgb(229, 231, 235);
+    color: rgb(156, 163, 175);
+    cursor: not-allowed;
+  }
+  
+  svg {
+    position: relative;
+    z-index: 10;
+    width: 1.125rem;
+    height: 1.125rem;
+    transition: transform 0.2s ease;
+  }
+  
+  &:hover svg {
+    transform: translate(0.125rem, -0.125rem);
+  }
+}
+
+.ripple {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.2);
+  opacity: 0;
+}
+
+.sendButton.active:active .ripple {
+  opacity: 1;
+  animation: ping 0.5s ease-out;
+}
+
+// 애니메이션
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fadeInSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import styles from './ChatBot.module.scss';
 
 interface Message {
   id: string;
@@ -118,15 +119,11 @@ export default function ChatBot({ type }: ChatBotProps) {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-8 left-8 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-xl transition-all hover:scale-105"
-          style={{
-            boxShadow:
-              '0 10px 25px -5px rgba(59, 130, 246, 0.5), 0 8px 10px -6px rgba(59, 130, 246, 0.4)',
-          }}
+          className={styles.chatButton}
         >
           <svg
-            width="24"
-            height="24"
+            width="26"
+            height="26"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -136,35 +133,34 @@ export default function ChatBot({ type }: ChatBotProps) {
           >
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
           </svg>
+
+          {/* Notification Badge */}
+          <span className={styles.notificationBadge}>
+            <span className={styles.ping}></span>
+            <span className={styles.badge}>
+              <span>1</span>
+            </span>
+          </span>
+
+          {/* Shimmer Effect */}
+          <div className={styles.shimmer}></div>
         </button>
       )}
 
       {/* 챗봇 창 */}
       {isOpen && (
-        <div
-          className="fixed bottom-8 left-8 z-50 flex h-[640px] w-[400px] flex-col overflow-hidden rounded-3xl bg-white"
-          style={{
-            boxShadow: '0 20px 60px -10px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.05)',
-            backdropFilter: 'blur(10px)',
-          }}
-        >
+        <div className={styles.chatWindow}>
           {/* 헤더 */}
-          <div
-            className={`px-8 py-6 ${
-              type === 'user'
-                ? 'bg-gradient-to-br from-blue-500 via-blue-600 to-blue-700'
-                : 'bg-gradient-to-br from-indigo-500 via-purple-600 to-purple-700'
-            } relative overflow-hidden text-white`}
-          >
+          <div className={`${styles.chatHeader} ${type === 'user' ? styles.user : styles.admin}`}>
             {/* 배경 패턴 */}
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white blur-2xl"></div>
-              <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-white blur-2xl"></div>
+            <div className={styles.headerPattern}>
+              <div className={styles.circle1}></div>
+              <div className={styles.circle2}></div>
             </div>
 
-            <div className="relative flex items-center justify-between gap-4">
-              <div className="flex min-w-0 flex-1 items-center gap-3">
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center">
+            <div className={styles.headerContent}>
+              <div className={styles.headerLeft}>
+                <div className={styles.headerIcon}>
                   <svg
                     width="28"
                     height="28"
@@ -178,19 +174,19 @@ export default function ChatBot({ type }: ChatBotProps) {
                     <circle cx="15" cy="10" r="1" fill="white" />
                   </svg>
                 </div>
-                <div className="min-w-0 flex-1 pr-2">
-                  <h3 className="mb-1 truncate text-lg leading-tight font-bold">
+                <div className={styles.headerInfo}>
+                  <h3>
                     {type === 'user' ? '해양환경 챗봇' : '행정업무 챗봇'}
                   </h3>
-                  <p className="text-opacity-80 flex items-center gap-1 text-xs text-white">
-                    <span className="h-2 w-2 animate-pulse rounded-full bg-green-400"></span>
+                  <p>
+                    <span className={styles.onlineIndicator}></span>
                     온라인
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
-                className="flex h-10 w-10 flex-shrink-0 items-center justify-center transition-all hover:scale-110 hover:rotate-90"
+                className={styles.closeButton}
               >
                 <svg
                   width="24"
@@ -209,34 +205,23 @@ export default function ChatBot({ type }: ChatBotProps) {
           </div>
 
           {/* 메시지 영역 */}
-          <div className="flex-1 space-y-3 overflow-y-auto bg-gradient-to-b from-gray-50 to-white p-6">
-            {messages.map(message => (
+          <div className={styles.messagesArea}>
+            {messages.map((message, index) => (
               <div
                 key={message.id}
-                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}
+                className={`${styles.messageWrapper} ${message.sender === 'user' ? styles.user : styles.bot}`}
+                style={{
+                  animationDelay: `${index * 0.05}s`,
+                }}
               >
-                <div
-                  className={`max-w-[75%] rounded-2xl px-5 py-3.5 ${
-                    message.sender === 'user'
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md'
-                      : 'border border-gray-100 bg-white text-gray-800 shadow-sm'
-                  }`}
-                  style={
-                    message.sender === 'user'
-                      ? {
-                          boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-                        }
-                      : {}
-                  }
-                >
-                  <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">
-                    {message.text}
-                  </p>
-                  <p
-                    className={`mt-2 text-xs ${
-                      message.sender === 'user' ? 'text-blue-100' : 'text-gray-400'
-                    }`}
-                  >
+                <div className={`${styles.messageBubble} ${message.sender === 'user' ? styles.user : styles.bot}`}>
+                  <p>{message.text}</p>
+                  <p className={`${styles.messageTime} ${message.sender === 'user' ? styles.user : styles.bot}`}>
+                    {message.sender === 'user' && (
+                      <svg viewBox="0 0 12 12" fill="currentColor">
+                        <path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z"/>
+                      </svg>
+                    )}
                     {message.timestamp.toLocaleTimeString('ko-KR', {
                       hour: '2-digit',
                       minute: '2-digit',
@@ -249,36 +234,27 @@ export default function ChatBot({ type }: ChatBotProps) {
           </div>
 
           {/* 입력 영역 */}
-          <div className="border-t border-gray-100 bg-white p-5">
-            <div className="flex items-center gap-3">
+          <div className={styles.inputArea}>
+            <div className={styles.inputContainer}>
               <input
                 type="text"
                 value={inputValue}
                 onChange={e => setInputValue(e.target.value)}
                 onKeyPress={e => e.key === 'Enter' && handleSend()}
                 placeholder="메시지를 입력하세요..."
-                className="flex-1 rounded-full border-0 bg-gray-100 px-5 py-3.5 text-sm transition-all placeholder:text-gray-400 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                style={{ boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.04)' }}
+                className={styles.messageInput}
               />
               <button
                 onClick={handleSend}
                 disabled={!inputValue.trim()}
-                className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full transition-all ${
-                  inputValue.trim()
-                    ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md hover:scale-105'
-                    : 'cursor-not-allowed bg-gray-200 text-gray-400'
-                }`}
-                style={
-                  inputValue.trim()
-                    ? {
-                        boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-                      }
-                    : {}
-                }
+                className={`${styles.sendButton} ${inputValue.trim() ? styles.active : styles.disabled}`}
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
                 </svg>
+                {inputValue.trim() && (
+                  <div className={styles.ripple}></div>
+                )}
               </button>
             </div>
           </div>

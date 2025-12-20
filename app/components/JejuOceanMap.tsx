@@ -7,6 +7,7 @@ import { TextLayer } from '@deck.gl/layers';
 import DeckGL from '@deck.gl/react';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Map as MapGL } from 'react-map-gl/mapbox';
+import styles from './JejuOceanMap.module.scss';
 
 const MAPBOX_ACCESS_TOKEN =
   'pk.eyJ1IjoieW9uZ3dvb24iLCJhIjoiY21qNm93cXJlMGdyejNmcTJzMGVrZHNyZCJ9.MWEH1d2ExoNoykCYtndGGw';
@@ -182,6 +183,8 @@ export default function JejuOceanMap() {
   const [selectedPoint, setSelectedPoint] = useState<DataPoint | null>(null);
   const [hoveredPoint, setHoveredPoint] = useState<DataPoint | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [currentBearing, setCurrentBearing] = useState(-17.6);
+  const [currentPitch, setCurrentPitch] = useState(60);
 
   const INITIAL_VIEW_STATE = {
     longitude: 126.5312,
@@ -251,16 +254,26 @@ export default function JejuOceanMap() {
       return point.level === filter;
     });
 
+    // 현재 카메라 방향으로 오프셋 계산 (막대 앞쪽에 배치)
+    const bearingRad = currentBearing * (Math.PI / 180);
+    // pitch에 따라 offset 조정 (pitch가 높을수록 offset 증가)
+    const pitchFactor = currentPitch / 60; // 기준 pitch 60도
+    const offset = -0.035 * pitchFactor; // pitch에 비례하여 조정
+
     return filteredData.map(point => ({
-      position: [point.lng, point.lat, point.value * 20 + 3000],
+      position: [
+        point.lng + offset * Math.sin(bearingRad),
+        point.lat + offset * Math.cos(bearingRad), 
+        point.value * 25 + 4000 // z 좌표 약간 낮춤
+      ],
       text: point.name,
       value: point.value,
       name: point.name,
     }));
-  }, [filter]);
+  }, [filter, currentBearing, currentPitch]);
 
   // 호버 핸들러 최적화 (같은 포인트에 호버 시 상태 업데이트 방지)
-  const handleHover = useCallback((info: any) => {
+  const handleHover = useCallback((info: any): boolean => {
     if (info.object) {
       let pointName = null;
 
@@ -282,11 +295,12 @@ export default function JejuOceanMap() {
             return point;
           });
           setMousePos({ x: info.x, y: info.y });
-          return;
+          return true;
         }
       }
     }
     setHoveredPoint(null);
+    return false;
   }, []);
 
   const layers = useMemo(
@@ -322,12 +336,12 @@ export default function JejuOceanMap() {
         getPosition: (d: any) => d.position,
         getText: (d: any) => d.text,
 
-        // Size Configuration
-        getSize: 48,
+        // Size Configuration - pixels로 변경하여 크기 문제 해결
+        getSize: 10,
         sizeScale: 1,
-        sizeUnits: 'meters',
-        sizeMinPixels: 18,
-        sizeMaxPixels: 40,
+        sizeUnits: 'pixels',
+        sizeMinPixels: 14,
+        sizeMaxPixels: 20,
 
         // Color & Styling
         getColor: [255, 255, 255, 255],
@@ -335,21 +349,24 @@ export default function JejuOceanMap() {
         getAlignmentBaseline: 'center',
 
         // 3D Billboard Mode
-        billboard: true,
+        billboard: true, // billboard 켜서 카메라를 향하게
 
-        // Background for readability
+        // Background for readability - 반투명 검은 배경 추가
         background: true,
-        getBackgroundColor: [0, 0, 0, 180],
-        backgroundPadding: [8, 4, 8, 4],
+        getBackgroundColor: [0, 0, 0, 160],
+        backgroundPadding: [6, 3, 6, 3],
 
-        // Outline for contrast
-        outlineWidth: 2,
-        outlineColor: [0, 0, 0, 255],
+        // Outline - 얇고 밝게
+        outlineWidth: 1,
+        outlineColor: [255, 255, 255, 80],
 
         // Font settings
         fontFamily: 'Arial, sans-serif',
         fontWeight: 'bold',
-
+        
+        // 한글 문자셋 명시
+        characterSet: 'auto',
+        
         // Interaction
         onHover: handleHover,
       }),
@@ -358,72 +375,71 @@ export default function JejuOceanMap() {
   );
 
   return (
-    <div className="absolute inset-0 h-full w-full">
+    <div className={styles.mapContainer}>
       {/* 필터 버튼 */}
-      <div className="absolute top-6 left-1/2 z-10 flex -translate-x-1/2 transform gap-2">
+      <div className={styles.filterContainer}>
+        {/* 전체보기 */}
         <button
           onClick={() => setFilter('all')}
-          className={`rounded-full px-6 py-2 font-medium transition-all ${
-            filter === 'all'
-              ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
+          className={`${styles.filterButton} ${styles.all} ${filter === 'all' ? styles.active : ''}`}
         >
-          전체보기 <span className="text-xs">ALL</span>
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
+          </svg>
+          전체보기
+          <span className={styles.subText}>ALL</span>
         </button>
+
+        {/* 낮음 */}
         <button
           onClick={() => setFilter('low')}
-          className={`rounded-full px-6 py-2 font-medium transition-all ${
-            filter === 'low'
-              ? 'bg-blue-500 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
+          className={`${styles.filterButton} ${styles.low} ${filter === 'low' ? styles.active : ''}`}
         >
-          낮음 <span className="text-xs">LOW</span>
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+          </svg>
+          낮음
+          <span className={styles.subText}>LOW</span>
         </button>
+
+        {/* 보통 */}
         <button
           onClick={() => setFilter('medium')}
-          className={`rounded-full px-6 py-2 font-medium transition-all ${
-            filter === 'medium'
-              ? 'bg-yellow-500 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
+          className={`${styles.filterButton} ${styles.medium} ${filter === 'medium' ? styles.active : ''}`}
         >
-          보통 <span className="text-xs">MEDIUM</span>
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M3 10a1 1 0 011-1h5V4a1 1 0 112 0v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 01-1-1z" clipRule="evenodd" />
+          </svg>
+          보통
+          <span className={styles.subText}>MEDIUM</span>
         </button>
+
+        {/* 높음 */}
         <button
           onClick={() => setFilter('high')}
-          className={`rounded-full px-6 py-2 font-medium transition-all ${
-            filter === 'high'
-              ? 'bg-red-500 text-white shadow-lg'
-              : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-          }`}
+          className={`${styles.filterButton} ${styles.high} ${filter === 'high' ? styles.active : ''}`}
         >
-          높음 <span className="text-xs">HIGH</span>
+          <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+          </svg>
+          높음
+          <span className={styles.subText}>HIGH</span>
         </button>
       </div>
 
       {/* DeckGL + Mapbox 지도 */}
       <DeckGL
         initialViewState={INITIAL_VIEW_STATE}
-        controller={{
-          scrollZoom: true,
-          dragPan: true,
-          dragRotate: true,
-          doubleClickZoom: true,
-          touchZoom: true,
-          touchRotate: true,
-          keyboard: true,
-          minZoom: 8.5,
-          maxZoom: 12,
-          minPitch: 0,
-          maxPitch: 85,
-        }}
+        controller={true}
         layers={layers}
+        onViewStateChange={({ viewState }: any) => {
+          setCurrentBearing(viewState.bearing || 0);
+          setCurrentPitch(viewState.pitch || 60);
+        }}
       >
         <MapGL
           mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
-          mapStyle="mapbox://styles/mapbox/dark-v11"
+          mapStyle="mapbox://styles/mapbox/satellite-streets-v12"
           maxBounds={[
             [126.0, 33.0], // 남서쪽 경계 (좌하단)
             [127.2, 33.8], // 북동쪽 경계 (우상단)
@@ -434,41 +450,19 @@ export default function JejuOceanMap() {
       {/* 호버 팝업 */}
       {hoveredPoint && (
         <div
-          className="pointer-events-none absolute z-50"
+          className={styles.hoverPopup}
           style={{
             left: `${mousePos.x + 20}px`,
             top: `${mousePos.y - 100}px`,
           }}
         >
-          <div className="animate-fadeInScale pointer-events-auto w-80 scale-95 transform rounded-2xl bg-white opacity-0 shadow-2xl transition-all duration-200 ease-out">
-            <style jsx>{`
-              @keyframes fadeInScale {
-                from {
-                  opacity: 0;
-                  transform: scale(0.95) translateY(10px);
-                }
-                to {
-                  opacity: 1;
-                  transform: scale(1) translateY(0);
-                }
-              }
-              .animate-fadeInScale {
-                animation: fadeInScale 0.2s ease-out forwards;
-              }
-            `}</style>
-            <div className="relative p-5">
-              <h3 className="mb-4 text-xl font-bold text-gray-800">{hoveredPoint.name}</h3>
+          <div className={styles.popupCard}>
+            <div className={styles.popupContent}>
+              <h3 className={styles.popupTitle}>{hoveredPoint.name}</h3>
 
-              <div
-                className={`mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold ${
-                  hoveredPoint.level === 'high'
-                    ? 'bg-green-500 text-white'
-                    : hoveredPoint.level === 'medium'
-                      ? 'bg-yellow-500 text-white'
-                      : 'bg-blue-500 text-white'
-                }`}
-              >
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="white">
+              {/* Status Badge */}
+              <div className={`${styles.statusBadge} ${styles[hoveredPoint.level]}`}>
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
                   <path
                     fillRule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -482,7 +476,8 @@ export default function JejuOceanMap() {
                     : '주의'}
               </div>
 
-              <div className="mb-4 flex items-center justify-center rounded-xl bg-gray-50 p-4">
+              {/* Swim Status Icon */}
+              <div className={styles.swimIconContainer}>
                 {hoveredPoint.swimStatus === 'prohibited' ? (
                   <svg width="90" height="60" viewBox="0 0 120 80" style={{ opacity: 0.8 }}>
                     <rect
@@ -549,41 +544,55 @@ export default function JejuOceanMap() {
                 )}
               </div>
 
-              <ul className="space-y-2 text-sm">
-                <li className="flex items-start gap-2">
-                  <span className="font-medium text-gray-800">•</span>
-                  <div>
-                    <span className="font-medium text-gray-600">현재 상태: </span>
-                    <strong className="text-gray-900">{hoveredPoint.status}</strong>
+              {/* Information List */}
+              <ul className={styles.infoList}>
+                <li>
+                  <span className={styles.infoBullet}>●</span>
+                  <div className={styles.infoContent}>
+                    <span className={styles.label}>현재 상태: </span>
+                    <strong className={styles.value}>{hoveredPoint.status}</strong>
                   </div>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-medium text-gray-800">•</span>
-                  <div>
-                    <span className="font-medium text-gray-600">예상 쓰레기량: </span>
-                    <strong className="text-gray-900">
+                <li>
+                  <span className={styles.infoBullet}>●</span>
+                  <div className={styles.infoContent}>
+                    <span className={styles.label}>예상 쓰레기량: </span>
+                    <strong className={styles.value}>
                       {hoveredPoint.value}kg{' '}
-                      <span className="text-sm text-gray-500">(이번 주)</span>
+                      <span className={styles.subValue}>(이번 주)</span>
                     </strong>
                   </div>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-medium text-gray-800">•</span>
-                  <div>
-                    <span className="font-medium text-gray-600">최근 수거일: </span>
-                    <strong className="text-gray-900">{hoveredPoint.lastCollected}</strong>
+                <li>
+                  <span className={styles.infoBullet}>●</span>
+                  <div className={styles.infoContent}>
+                    <span className={styles.label}>최근 수거일: </span>
+                    <strong className={styles.value}>{hoveredPoint.lastCollected}</strong>
                   </div>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-medium text-gray-800">•</span>
-                  <div>
-                    <span className="font-medium text-gray-600">수온: </span>
-                    <strong className="text-gray-900">{hoveredPoint.temperature}</strong>
-                    <span className="font-medium text-gray-600"> / 날씨: </span>
-                    <strong className="text-gray-900">{hoveredPoint.weather}</strong>
+                <li>
+                  <span className={styles.infoBullet}>●</span>
+                  <div className={styles.infoContent}>
+                    <span className={styles.label}>수온: </span>
+                    <strong className={styles.value}>{hoveredPoint.temperature}</strong>
+                    <span className={styles.label}> / 날씨: </span>
+                    <strong className={styles.value}>{hoveredPoint.weather}</strong>
                   </div>
                 </li>
               </ul>
+
+              {/* Risk Level Progress Bar */}
+              <div className={styles.riskSection}>
+                <div className={styles.riskHeader}>
+                  <span className={styles.riskLabel}>위험도</span>
+                  <span className={styles.riskValue}>
+                    {hoveredPoint.level === 'high' ? '높음' : hoveredPoint.level === 'medium' ? '보통' : '낮음'}
+                  </span>
+                </div>
+                <div className={styles.progressBar}>
+                  <div className={`${styles.progressFill} ${styles[hoveredPoint.level]}`}></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
