@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { HexagonLayer } from '@deck.gl/aggregation-layers';
 import { TextLayer } from '@deck.gl/layers';
@@ -17,6 +17,20 @@ function seededRandom(seed: number): number {
   return x - Math.floor(x);
 }
 
+// API 응답 타입 정의
+interface ApiBeachData {
+  name: string;
+  date: string;
+  location: {
+    latitude: number;
+    longitude: number;
+  };
+  prediction: {
+    trash_amount: number;
+  };
+  status: 'LOW' | 'MEDIUM' | 'HIGH';
+}
+
 interface DataPoint {
   id: string;
   name: string;
@@ -31,157 +45,82 @@ interface DataPoint {
   swimStatus: 'safe' | 'caution' | 'prohibited';
 }
 
-const oceanData: DataPoint[] = [
-  {
-    id: '1',
-    name: '애월해안',
-    lat: 33.44639,
-    lng: 126.29343,
-    value: 140,
-    level: 'high',
-    status: '청정 - 방문 안전',
-    lastCollected: '2025.12.08',
-    temperature: '18°C',
+// API 데이터를 DataPoint로 변환하는 함수
+function convertApiDataToDataPoint(apiData: ApiBeachData, index: number): DataPoint {
+  const level = apiData.status.toLowerCase() as 'low' | 'medium' | 'high';
+  
+  // status 텍스트 매핑
+  const statusText = 
+    level === 'high' ? '청정 - 방문 안전' :
+    level === 'medium' ? '양호 - 모니터링' :
+    '주의 필요';
+  
+  // swimStatus는 쓰레기량에 따라 결정 (임시 로직)
+  const swimStatus: 'safe' | 'caution' | 'prohibited' = 
+    apiData.prediction.trash_amount > 100 ? 'prohibited' :
+    apiData.prediction.trash_amount > 70 ? 'caution' : 'safe';
+  
+  return {
+    id: String(index + 1),
+    name: apiData.name,
+    lat: apiData.location.latitude,
+    lng: apiData.location.longitude,
+    value: apiData.prediction.trash_amount,
+    level,
+    status: statusText,
+    lastCollected: apiData.date,
+    temperature: '18°C', // API에서 제공하지 않는 정보는 기본값
     weather: '맑음',
-    swimStatus: 'prohibited',
-  },
-  {
-    id: '2',
-    name: '조천해안',
-    lat: 33.54323,
-    lng: 126.66986,
-    value: 114,
-    level: 'high',
-    status: '청정 - 방문 안전',
-    lastCollected: '2025.12.10',
-    temperature: '17°C',
-    weather: '흐림',
-    swimStatus: 'safe',
-  },
-  {
-    id: '3',
-    name: '예래해안',
-    lat: 33.22843,
-    lng: 126.47737,
-    value: 87,
-    level: 'high',
-    status: '청정 - 방문 안전',
-    lastCollected: '2025.12.09',
-    temperature: '19°C',
-    weather: '맑음',
-    swimStatus: 'caution',
-  },
-  {
-    id: '4',
-    name: '한림해안',
-    lat: 33.39511,
-    lng: 126.24028,
-    value: 53,
-    level: 'medium',
-    status: '양호 - 모니터링',
-    lastCollected: '2025.12.11',
-    temperature: '18°C',
-    weather: '맑음',
-    swimStatus: 'safe',
-  },
-  {
-    id: '5',
-    name: '성산해안',
-    lat: 33.4733,
-    lng: 126.93454,
-    value: 115,
-    level: 'high',
-    status: '청정 - 방문 안전',
-    lastCollected: '2025.12.07',
-    temperature: '17°C',
-    weather: '흐림',
-    swimStatus: 'safe',
-  },
-  {
-    id: '6',
-    name: '중문해안',
-    lat: 33.24421,
-    lng: 126.41406,
-    value: 73,
-    level: 'medium',
-    status: '양호 - 모니터링',
-    lastCollected: '2025.12.12',
-    temperature: '19°C',
-    weather: '맑음',
-    swimStatus: 'safe',
-  },
-  {
-    id: '7',
-    name: '구좌해안',
-    lat: 33.55565,
-    lng: 126.79566,
-    value: 95,
-    level: 'high',
-    status: '청정 - 방문 안전',
-    lastCollected: '2025.12.08',
-    temperature: '18°C',
-    weather: '맑음',
-    swimStatus: 'caution',
-  },
-  {
-    id: '8',
-    name: '표선해안',
-    lat: 33.32585,
-    lng: 126.84252,
-    value: 68,
-    level: 'medium',
-    status: '양호 - 모니터링',
-    lastCollected: '2025.12.13',
-    temperature: '19°C',
-    weather: '맑음',
-    swimStatus: 'safe',
-  },
-  {
-    id: '9',
-    name: '안덕해안',
-    lat: 33.23,
-    lng: 126.295,
-    value: 82,
-    level: 'high',
-    status: '청정 - 방문 안전',
-    lastCollected: '2025.12.10',
-    temperature: '18°C',
-    weather: '흐림',
-    swimStatus: 'prohibited',
-  },
-  {
-    id: '10',
-    name: '남원해안',
-    lat: 33.27262,
-    lng: 126.66034,
-    value: 45,
-    level: 'medium',
-    status: '양호 - 모니터링',
-    lastCollected: '2025.12.14',
-    temperature: '19°C',
-    weather: '맑음',
-    swimStatus: 'safe',
-  },
-  {
-    id: '11',
-    name: '대정해안',
-    lat: 33.21641,
-    lng: 126.25031,
-    value: 59,
-    level: 'medium',
-    status: '양호 - 모니터링',
-    lastCollected: '2025.12.11',
-    temperature: '18°C',
-    weather: '맑음',
-    swimStatus: 'safe',
-  },
-];
+    swimStatus,
+  };
+}
 
 export default function JejuOceanMap() {
   const [filter, setFilter] = useState<'all' | 'low' | 'medium' | 'high'>('all');
   const [selectedPoint, setSelectedPoint] = useState<DataPoint | null>(null);
   const [hoveredPoint, setHoveredPoint] = useState<DataPoint | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [oceanData, setOceanData] = useState<DataPoint[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // 클라이언트 사이드에서만 렌더링되도록 보장
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // API에서 데이터 가져오기
+  useEffect(() => {
+    const fetchBeachData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        
+        const apiHost = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:8000';
+        const predictionDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD 형식
+        const url = `${apiHost}/api/v1/trash/beach?prediction_date=${predictionDate}`;
+        
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+          throw new Error(`API 요청 실패: ${response.status}`);
+        }
+        
+        const data: ApiBeachData[] = await response.json();
+        const convertedData = data.map((item, index) => convertApiDataToDataPoint(item, index));
+        
+        setOceanData(convertedData);
+      } catch (err) {
+        console.error('해양 데이터 로딩 실패:', err);
+        setError(err instanceof Error ? err.message : '데이터를 불러오는데 실패했습니다.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBeachData();
+  }, []);
 
   const INITIAL_VIEW_STATE = {
     longitude: 126.5312,
@@ -356,6 +295,44 @@ export default function JejuOceanMap() {
     ],
     [hexagonData, labelData, handleHover]
   );
+
+  // 클라이언트 사이드가 아니면 null 반환
+  if (!isMounted) {
+    return null;
+  }
+
+  // 로딩 상태
+  if (isLoading) {
+    return (
+      <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gray-900">
+        <div className="text-center">
+          <div className="mb-4 h-16 w-16 animate-spin rounded-full border-4 border-gray-700 border-t-blue-500 mx-auto"></div>
+          <p className="text-lg text-gray-300">해양 데이터 로딩 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 에러 상태
+  if (error) {
+    return (
+      <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gray-900">
+        <div className="max-w-md rounded-lg bg-red-900/50 p-6 text-center">
+          <svg className="mx-auto mb-4 h-16 w-16 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <h3 className="mb-2 text-xl font-bold text-white">데이터 로딩 실패</h3>
+          <p className="text-gray-300">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 rounded-lg bg-red-600 px-6 py-2 text-white hover:bg-red-700 transition-colors"
+          >
+            다시 시도
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="absolute inset-0 h-full w-full">
