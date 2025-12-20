@@ -85,10 +85,22 @@ export default function JejuOceanMap() {
   const [error, setError] = useState<string | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
-  // 클라이언트 사이드에서만 렌더링되도록 보장
+  // 클라이언트 사이드에서만 렌더링되도록 보장 - 최우선 체크
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
+  // 클라이언트 사이드가 아니면 즉시 null 반환
+  if (!isMounted) {
+    return (
+      <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gray-900">
+        <div className="text-center">
+          <div className="mb-4 h-16 w-16 animate-spin rounded-full border-4 border-gray-700 border-t-blue-500 mx-auto"></div>
+          <p className="text-lg text-gray-300">초기화 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   // API에서 데이터 가져오기
   useEffect(() => {
@@ -295,11 +307,6 @@ export default function JejuOceanMap() {
     ],
     [hexagonData, labelData, handleHover]
   );
-
-  // 클라이언트 사이드가 아니면 null 반환
-  if (!isMounted) {
-    return null;
-  }
 
   // 로딩 상태
   if (isLoading) {

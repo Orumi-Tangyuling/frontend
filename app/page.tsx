@@ -152,7 +152,7 @@ export default function WelcomePage() {
           className={`flex flex-col gap-4 transition-all delay-500 duration-1000 sm:flex-row ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
         >
           <Link
-            href="/dashboard"
+            href="/main"
             className="group flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-10 py-4 text-lg font-semibold text-white shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl"
           >
             <span>서비스 시작하기</span>
