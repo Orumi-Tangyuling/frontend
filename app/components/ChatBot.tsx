@@ -17,11 +17,28 @@ export default function ChatBot({ type }: ChatBotProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState<string>('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  // 세션 ID 초기화
+  useEffect(() => {
+    // localStorage에서 세션 ID 가져오거나 새로 생성
+    const storageKey = `chat_session_${type}`;
+    const storedSessionId = localStorage.getItem(storageKey);
+    
+    if (storedSessionId) {
+      setSessionId(storedSessionId);
+    } else {
+      const newSessionId = `${type}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      localStorage.setItem(storageKey, newSessionId);
+      setSessionId(newSessionId);
+    }
+  }, [type]);
 
   useEffect(() => {
     scrollToBottom();
@@ -43,8 +60,8 @@ export default function ChatBot({ type }: ChatBotProps) {
     }
   }, [isOpen, messages.length, type]);
 
-  const handleSend = () => {
-    if (!inputValue.trim()) return;
+  const handleSend = async () => {
+    if (!inputValue.trim() || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -54,61 +71,60 @@ export default function ChatBot({ type }: ChatBotProps) {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const messageText = inputValue;
     setInputValue('');
+    setIsLoading(true);
 
-    // 봇 응답 시뮬레이션
-    setTimeout(() => {
-      const botResponse = getBotResponse(inputValue, type);
+    try {
+      // API 호출
+      const apiHost = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:8000';
+      const endpoint = type === 'user' ? '/api/v1/chat/message/user' : '/api/v1/chat/message/admin';
+      
+      const response = await fetch(`${apiHost}${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: messageText,
+          session_id: sessionId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('챗봇 응답을 가져오는데 실패했습니다.');
+      }
+
+      const data = await response.json();
+      
+      // 서버에서 받은 session_id로 업데이트
+      if (data.session_id && data.session_id !== sessionId) {
+        setSessionId(data.session_id);
+        localStorage.setItem(`chat_session_${type}`, data.session_id);
+      }
+
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: botResponse,
+        text: data.response,
         sender: 'bot',
         timestamp: new Date(),
       };
+      
       setMessages(prev => [...prev, botMessage]);
-    }, 500);
-  };
-
-  const getBotResponse = (input: string, chatType: 'user' | 'admin'): string => {
-    const lowerInput = input.toLowerCase();
-
-    if (chatType === 'user') {
-      // 일반 사용자용 응답
-      if (lowerInput.includes('수영') || lowerInput.includes('해수욕')) {
-        return '현재 제주도 해안 11개 지역의 수질 상태를 실시간으로 모니터링하고 있습니다. 지도에서 각 지역을 클릭하시면 수영 가능 여부를 확인하실 수 있습니다.';
-      }
-      if (lowerInput.includes('쓰레기') || lowerInput.includes('오염')) {
-        return '저희 서비스는 AI 기반으로 각 해안 지역의 쓰레기 발생량을 예측합니다. 지도의 3D 원기둥 높이가 예상 쓰레기량을 나타냅니다.';
-      }
-      if (lowerInput.includes('날씨') || lowerInput.includes('수온')) {
-        return '각 지역의 현재 수온과 날씨 정보는 지도에서 해당 지역을 클릭하시면 확인하실 수 있습니다.';
-      }
-      if (
-        lowerInput.includes('어디') ||
-        lowerInput.includes('위치') ||
-        lowerInput.includes('지역')
-      ) {
-        return '제주도 전역 11개 주요 해안 지역(애월, 조천, 예래, 한림, 성산, 중문, 구좌, 표선, 안덕, 남원, 대정)을 모니터링하고 있습니다.';
-      }
-      return '해양환경, 수질 상태, 수영 가능 여부 등에 대해 궁금하신 점을 물어보세요. 지도에서 원하시는 지역을 클릭하면 더 자세한 정보를 확인하실 수 있습니다.';
-    } else {
-      // 행정업무용 응답
-      if (lowerInput.includes('보고서') || lowerInput.includes('리포트')) {
-        return '주간/월간 보고서 생성 기능을 제공합니다. 상단 메뉴에서 "보고서 생성" 버튼을 클릭하시면 됩니다.';
-      }
-      if (lowerInput.includes('통계') || lowerInput.includes('데이터')) {
-        return '현재 대시보드에서 총 수거량, 고위험 지역 수, 평균 수질 등의 통계를 확인하실 수 있습니다. 추가 분석이 필요하시면 말씀해주세요.';
-      }
-      if (lowerInput.includes('알림') || lowerInput.includes('경고')) {
-        return '고위험 지역 발생 시 자동으로 알림을 발송합니다. 알림 설정은 우측 상단 설정 메뉴에서 변경 가능합니다.';
-      }
-      if (lowerInput.includes('수거') || lowerInput.includes('청소')) {
-        return '수거 일정 관리 및 작업 배정은 "작업 관리" 메뉴에서 가능합니다. 예상 쓰레기량을 기반으로 우선순위를 자동 설정합니다.';
-      }
-      if (lowerInput.includes('예측') || lowerInput.includes('ai')) {
-        return 'AI 예측 모델은 과거 데이터, 날씨, 해류 등을 분석하여 향후 7일간의 쓰레기 발생량을 예측합니다. 정확도는 약 87%입니다.';
-      }
-      return '행정업무 관련 기능(보고서 생성, 통계 분석, 수거 일정 관리 등)에 대해 안내해드립니다. 필요하신 기능을 말씀해주세요.';
+    } catch (error) {
+      console.error('챗봇 에러:', error);
+      
+      // 에러 발생 시 fallback 응답
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: '죄송합니다. 일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        sender: 'bot',
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -245,6 +261,20 @@ export default function ChatBot({ type }: ChatBotProps) {
                 </div>
               </div>
             ))}
+            
+            {/* 로딩 인디케이터 */}
+            {isLoading && (
+              <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div className="max-w-[75%] rounded-2xl border border-gray-100 bg-white px-5 py-3.5 shadow-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400" style={{ animationDelay: '0ms' }}></div>
+                    <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400" style={{ animationDelay: '150ms' }}></div>
+                    <div className="h-2 w-2 animate-bounce rounded-full bg-gray-400" style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div ref={messagesEndRef} />
           </div>
 
@@ -262,23 +292,30 @@ export default function ChatBot({ type }: ChatBotProps) {
               />
               <button
                 onClick={handleSend}
-                disabled={!inputValue.trim()}
+                disabled={!inputValue.trim() || isLoading}
                 className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full transition-all ${
-                  inputValue.trim()
+                  inputValue.trim() && !isLoading
                     ? 'bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md hover:scale-105'
                     : 'cursor-not-allowed bg-gray-200 text-gray-400'
                 }`}
                 style={
-                  inputValue.trim()
+                  inputValue.trim() && !isLoading
                     ? {
                         boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
                       }
                     : {}
                 }
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                </svg>
+                {isLoading ? (
+                  <svg className="h-5 w-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                  </svg>
+                )}
               </button>
             </div>
           </div>

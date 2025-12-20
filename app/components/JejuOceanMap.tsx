@@ -90,20 +90,10 @@ export default function JejuOceanMap() {
     setIsMounted(true);
   }, []);
 
-  // 클라이언트 사이드가 아니면 즉시 null 반환
-  if (!isMounted) {
-    return (
-      <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gray-900">
-        <div className="text-center">
-          <div className="mb-4 h-16 w-16 animate-spin rounded-full border-4 border-gray-700 border-t-blue-500 mx-auto"></div>
-          <p className="text-lg text-gray-300">초기화 중...</p>
-        </div>
-      </div>
-    );
-  }
-
   // API에서 데이터 가져오기
   useEffect(() => {
+    if (!isMounted) return; // 마운트되지 않았으면 데이터 로딩 스킵
+    
     const fetchBeachData = async () => {
       try {
         setIsLoading(true);
@@ -132,7 +122,7 @@ export default function JejuOceanMap() {
     };
 
     fetchBeachData();
-  }, []);
+  }, [isMounted]);
 
   const INITIAL_VIEW_STATE = {
     longitude: 126.5312,
@@ -307,6 +297,18 @@ export default function JejuOceanMap() {
     ],
     [hexagonData, labelData, handleHover]
   );
+
+  // 클라이언트 사이드가 아니면 로딩 화면 반환
+  if (!isMounted) {
+    return (
+      <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gray-900">
+        <div className="text-center">
+          <div className="mb-4 h-16 w-16 animate-spin rounded-full border-4 border-gray-700 border-t-blue-500 mx-auto"></div>
+          <p className="text-lg text-gray-300">초기화 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   // 로딩 상태
   if (isLoading) {
