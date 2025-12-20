@@ -525,6 +525,187 @@ export default function AdminDashboard() {
                 </p>
               </div>
 
+              {/* 방문객 추이 차트 */}
+              <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6">
+                <h3 className="mb-6 text-lg font-bold text-gray-800">
+                  제주 해안별 월별 방문객 추이
+                </h3>
+                <div className="overflow-x-auto">
+                  <div className="min-w-[1200px]">
+                    {(() => {
+                      // 데이터 전처리: 지역별로 그룹화
+                      const regionMap = new Map<string, Map<string, number>>();
+                      const allMonths = new Set<string>();
+                      
+                      dashboardData.visitor_stats.forEach(stat => {
+                        if (!regionMap.has(stat.region)) {
+                          regionMap.set(stat.region, new Map());
+                        }
+                        regionMap.get(stat.region)!.set(stat.year_month, stat.visitor);
+                        allMonths.add(stat.year_month);
+                      });
+                      
+                      // 월 정렬
+                      const sortedMonths = Array.from(allMonths).sort();
+                      
+                      // 색상 팔레트
+                      const colors = [
+                        '#06b6d4', // cyan
+                        '#ef4444', // red
+                        '#22c55e', // green
+                        '#a855f7', // purple
+                        '#f59e0b', // amber
+                        '#8b5cf6', // violet
+                        '#eab308', // yellow
+                        '#ec4899', // pink
+                        '#14b8a6', // teal
+                      ];
+                      
+                      // 지역 데이터 생성
+                      const regions = Array.from(regionMap.entries()).map(([name, monthData], idx) => ({
+                        name,
+                        data: sortedMonths.map(month => monthData.get(month) || 0),
+                        color: colors[idx % colors.length],
+                      }));
+                      
+                      // Y축 최대값 계산
+                      const maxValue = Math.max(...regions.flatMap(r => r.data.filter(v => v > 0)));
+                      const yAxisMax = Math.ceil(maxValue / 100000) * 100000;
+                      
+                      // X축 간격 계산
+                      const xStart = 80;
+                      const xStep = Math.min(50, (1100 - xStart) / (sortedMonths.length - 1));
+                      
+                      return (
+                        <svg width="1200" height="400" className="mx-auto">
+                          <defs>
+                            <linearGradient id="gridGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                              <stop offset="0%" stopColor="#e5e7eb" stopOpacity="0.5" />
+                              <stop offset="100%" stopColor="#e5e7eb" stopOpacity="0" />
+                            </linearGradient>
+                          </defs>
+
+                          {/* 그리드 라인 */}
+                          {[0, 1, 2, 3, 4, 5, 6].map(i => {
+                            const y = 50 + i * 50;
+                            const value = yAxisMax - (i * yAxisMax / 6);
+                            return (
+                              <g key={i}>
+                                <line
+                                  x1="60"
+                                  y1={y}
+                                  x2="1180"
+                                  y2={y}
+                                  stroke="#e5e7eb"
+                                  strokeWidth="1"
+                                />
+                                <text x="45" y={y + 5} fontSize="11" fill="#6b7280" textAnchor="end">
+                                  {(value / 10000).toFixed(0)}만
+                                </text>
+                              </g>
+                            );
+                          })}
+
+                          {/* X축 월별 라벨 */}
+                          {sortedMonths.map((month, idx) => {
+                            const x = xStart + idx * xStep;
+                            // 월 포맷팅 (YYYY-MM -> MM 또는 YYYY.MM)
+                            const displayMonth = month.includes('-') ? month.split('-')[1] : month;
+                            return (
+                              <text
+                                key={idx}
+                                x={x}
+                                y="370"
+                                fontSize="10"
+                                fill="#6b7280"
+                                textAnchor="middle"
+                              >
+                                {displayMonth}
+                              </text>
+                            );
+                          })}
+
+                          {/* 데이터 라인 */}
+                          {regions.map((region, regionIdx) => {
+                            const points = region.data
+                              .map((value, idx) => {
+                                const x = xStart + idx * xStep;
+                                const y = value > 0 ? 350 - ((value / yAxisMax) * 300) : null;
+                                return y !== null ? `${x},${y}` : null;
+                              })
+                              .filter(p => p !== null)
+                              .join(' ');
+
+                            return (
+                              <g key={regionIdx}>
+                                <polyline
+                                  points={points}
+                                  fill="none"
+                                  stroke={region.color}
+                                  strokeWidth="2.5"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                                {region.data.map((value, idx) => {
+                                  if (value === 0) return null;
+                                  const x = xStart + idx * xStep;
+                                  const y = 350 - ((value / yAxisMax) * 300);
+                                  return (
+                                    <circle
+                                      key={idx}
+                                      cx={x}
+                                      cy={y}
+                                      r="3"
+                                      fill={region.color}
+                                      className="hover:r-5 cursor-pointer transition-all"
+                                    >
+                                      <title>{`${region.name} ${sortedMonths[idx]}: ${value.toLocaleString()}명`}</title>
+                                    </circle>
+                                  );
+                                })}
+                              </g>
+                            );
+                          })}
+
+                          {/* X축 */}
+                          <line x1="60" y1="350" x2="1180" y2="350" stroke="#9ca3af" strokeWidth="2" />
+                          <text
+                            x="620"
+                            y="395"
+                            fontSize="12"
+                            fill="#374151"
+                            fontWeight="600"
+                            textAnchor="middle"
+                          >
+                            월별
+                          </text>
+                        </svg>
+                      );
+                    })()}
+
+                    {/* 범례 */}
+                    <div className="mt-6 flex flex-wrap justify-center gap-4">
+                      {(() => {
+                        const regionNames = [...new Set(dashboardData.visitor_stats.map(s => s.region))];
+                        const colors = [
+                          '#06b6d4', '#ef4444', '#22c55e', '#a855f7', 
+                          '#f59e0b', '#8b5cf6', '#eab308', '#ec4899', '#14b8a6'
+                        ];
+                        return regionNames.map((name, idx) => (
+                          <div key={name} className="flex items-center gap-2">
+                            <div
+                              className="h-4 w-4 rounded-full"
+                              style={{ backgroundColor: colors[idx % colors.length] }}
+                            ></div>
+                            <span className="text-sm font-medium text-gray-700">{name}</span>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* 방문객 통계 테이블 */}
               <div className="rounded-xl border border-gray-200 bg-white p-6">
                 <h3 className="mb-4 text-lg font-bold text-gray-800">지역별 방문객 데이터</h3>
