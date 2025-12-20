@@ -149,13 +149,6 @@ export default function WelcomePage() {
             행정 담당자 로그인
           </Link>
         </div>
-
-        {/* 하단 정보 */}
-        <div className={`${styles.footer} ${mounted ? styles.mounted : ''}`}>
-          <p>
-            제주특별자치도 해양환경 보호를 위한 AI 예측 시스템
-          </p>
-        </div>
       </div>
     </div>
   );
