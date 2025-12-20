@@ -15,10 +15,12 @@ import {
 } from '@heroicons/react/24/outline';
 
 import ChatBot from '../components/ChatBot';
+import styles from './Admin.module.scss';
 
 export default function AdminDashboard() {
   const [activeMenu, setActiveMenu] = useState('statistics');
   const [chatMessage, setChatMessage] = useState('');
+  const [pdfUrl, setPdfUrl] = useState('/sample-report.pdf'); // 더미 PDF URL
 
   // 월별 데이터
   const monthlyData = [
@@ -75,91 +77,69 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className={styles.container}>
       {/* 왼쪽 사이드바 */}
-      <aside className="flex w-64 flex-col border-r border-gray-200 bg-white">
+      <aside className={styles.sidebar}>
         {/* 로고 */}
-        <div className="border-b border-gray-200 p-6">
-          <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <span className="text-xl font-bold text-gray-800">깨끗해양</span>
+        <div className={styles.logoSection}>
+          <div className={styles.logoContent}>
+            <img src="/logo.png" alt="깨끗해양" className={styles.logoImage} />
+            <span className={styles.logoText}>깨끗해양</span>
           </div>
         </div>
 
         {/* 메뉴 */}
-        <nav className="flex-1 p-4">
-          <div className="mb-6">
-            <h3 className="mb-3 text-xs font-semibold text-gray-500 uppercase">메뉴</h3>
-            <div className="space-y-1">
+        <nav className={styles.navigation}>
+          <div className={styles.navSection}>
+            <h3 className={styles.navTitle}>메뉴</h3>
+            <div className={styles.navButtons}>
               <button
                 onClick={() => setActiveMenu('statistics')}
-                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
-                  activeMenu === 'statistics'
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:bg-gray-50'
+                className={`${styles.navButton} ${
+                  activeMenu === 'statistics' ? styles.active : ''
                 }`}
               >
-                <ChartBarIcon className="h-5 w-5" />
-                <span className="font-medium">통계</span>
+                <ChartBarIcon />
+                <span>통계</span>
               </button>
               <button
                 onClick={() => setActiveMenu('reports')}
-                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
-                  activeMenu === 'reports'
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:bg-gray-50'
+                className={`${styles.navButton} ${
+                  activeMenu === 'reports' ? styles.active : ''
                 }`}
               >
-                <DocumentTextIcon className="h-5 w-5" />
-                <span className="font-medium">보고서 생성</span>
+                <DocumentTextIcon />
+                <span>보고서 생성</span>
               </button>
               <button
                 onClick={() => setActiveMenu('download')}
-                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
-                  activeMenu === 'download'
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:bg-gray-50'
+                className={`${styles.navButton} ${
+                  activeMenu === 'download' ? styles.active : ''
                 }`}
               >
-                <ArrowDownTrayIcon className="h-5 w-5" />
-                <span className="font-medium">데이터 다운로드</span>
+                <ArrowDownTrayIcon />
+                <span>데이터 다운로드</span>
               </button>
               <button
                 onClick={() => setActiveMenu('visitors')}
-                className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 transition-colors ${
-                  activeMenu === 'visitors'
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-700 hover:bg-gray-50'
+                className={`${styles.navButton} ${
+                  activeMenu === 'visitors' ? styles.active : ''
                 }`}
               >
-                <MapPinIcon className="h-5 w-5" />
-                <span className="font-medium">방문객 통계</span>
+                <MapPinIcon />
+                <span>방문객 통계</span>
               </button>
             </div>
           </div>
         </nav>
 
         {/* 로그아웃 */}
-        <div className="border-t border-gray-200 p-4">
+        <div className={styles.logoutSection}>
           <Link
             href="/"
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-gray-700 transition-colors hover:bg-gray-200"
+            className={styles.logoutButton}
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -173,70 +153,74 @@ export default function AdminDashboard() {
       </aside>
 
       {/* 메인 컨텐츠 */}
-      <main className="flex-1 overflow-y-auto">
+      <main className={styles.mainContent}>
         {/* 헤더 */}
-        <header className="border-b border-gray-200 bg-white px-8 py-6">
-          <h1 className="text-3xl font-bold text-gray-800">행정 대시보드</h1>
+        <header className={styles.header}>
+          <h1 className={styles.headerTitle}>행정 대시보드</h1>
         </header>
 
-        <div className="p-8">
+        <div className={styles.contentArea}>
           {activeMenu === 'statistics' && (
             <>
               {/* 타이틀 */}
-              <div className="mb-6">
-                <h2 className="mb-2 text-2xl font-bold text-gray-800">
+              <div className={styles.sectionTitle}>
+                <h2>
                   월간 예측 대시보드 - 2025년 12월
                 </h2>
               </div>
 
               {/* 통계 카드 */}
-              <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+              <div className={styles.statsGrid}>
                 {/* 총 예상 유입량 */}
-                <div className="rounded-xl border border-gray-200 bg-white p-6">
-                  <h3 className="mb-2 text-sm font-medium text-gray-600">총 예상 유입량</h3>
-                  <div className="mb-1 flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-blue-600">1,250 kg</span>
+                <div className={styles.statsCardSmall}>
+                  <h3>총 예상 유입량</h3>
+                  <div className={styles.statsValue}>
+                    <span className={styles.blue}>1,250 kg</span>
                   </div>
-                  <div className="flex items-center gap-1 text-sm">
-                    <span className="text-gray-500">전월 대비</span>
-                    <span className="flex items-center font-medium text-red-500">
+                  <div className={styles.statsDetails}>
+                    <span className={styles.label}>전월 대비</span>
+                    <span className={`${styles.value} ${styles.positive}`}>
                       +15%
-                      <ArrowTrendingUpIcon className="ml-1 h-4 w-4" />
+                      <ArrowTrendingUpIcon />
                     </span>
                   </div>
                 </div>
 
                 {/* 위험 지역 */}
-                <div className="rounded-xl border border-gray-200 bg-white p-6">
-                  <h3 className="mb-2 text-sm font-medium text-gray-600">위험 지역</h3>
-                  <div className="mb-1 flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-red-600">3개소</span>
+                <div className={styles.statsCardSmall}>
+                  <h3>위험 지역</h3>
+                  <div className={styles.statsValue}>
+                    <span className={styles.red}>3개소</span>
                   </div>
-                  <div className="text-sm text-gray-500">
-                    추적 지역: <span className="font-medium text-gray-700">5개소</span>
+                  <div className={styles.statsDetails}>
+                    <span className={styles.subvalue}>
+                      추적 지역: <span>5개소</span>
+                    </span>
                   </div>
                 </div>
 
                 {/* 수거 계획 필요 */}
-                <div className="rounded-xl border border-gray-200 bg-white p-6">
-                  <h3 className="mb-2 text-sm font-medium text-gray-600">수거 계획 필요</h3>
-                  <div className="mb-1 flex items-baseline gap-2">
-                    <span className="text-4xl font-bold text-orange-600">즉시 조치 2곳</span>
+                <div className={styles.statsCardSmall}>
+                  <h3>수거 계획 필요</h3>
+                  <div className={styles.statsValue}>
+                    <span className={styles.orange}>즉시 조치 2곳</span>
                   </div>
-                  <div className="text-sm text-gray-500">
-                    장기 점검 <span className="font-medium text-gray-700">8곳</span>
+                  <div className={styles.statsDetails}>
+                    <span className={styles.subvalue}>
+                      장기 점검 <span>8곳</span>
+                    </span>
                   </div>
                 </div>
               </div>
 
               {/* 월별 쓰레기 유입량 추이 차트 */}
-              <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6">
-                <h3 className="mb-6 text-lg font-bold text-gray-800">
+              <div className={styles.chartCard}>
+                <h3>
                   월별 쓰레기 유입량 추이 (6개월)
                 </h3>
-                <div className="relative h-64">
+                <div className={styles.chartContainer}>
                   {/* Y축 라벨 */}
-                  <div className="absolute top-0 bottom-8 left-0 flex flex-col justify-between text-sm text-gray-500">
+                  <div className={styles.chartYAxis}>
                     <span>2000</span>
                     <span>1500</span>
                     <span>1000</span>
@@ -245,30 +229,29 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* 차트 영역 */}
-                  <div className="ml-12 flex h-full items-end justify-around border-b border-l border-gray-200 pb-8">
+                  <div className={styles.chartArea}>
                     {monthlyData.map((data, index) => {
                       const height = (data.value / maxValue) * 100;
                       return (
                         <div
                           key={data.month}
-                          className="flex max-w-[80px] flex-1 flex-col items-center"
+                          className={styles.chartBar}
                         >
                           <div
-                            className="flex w-full flex-col items-center justify-end"
-                            style={{ height: '200px' }}
+                            className={styles.chartBarInner}
                           >
-                            <div className="relative flex w-full items-end justify-center">
+                            <div className={styles.barWrapper}>
                               <div
-                                className="group relative w-16 cursor-pointer rounded-t-lg bg-blue-500 transition-colors hover:bg-blue-600"
+                                className={styles.bar}
                                 style={{ height: `${height}%` }}
                               >
-                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-gray-800 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity group-hover:opacity-100">
+                                <div className={styles.barTooltip}>
                                   {data.value}kg
                                 </div>
                               </div>
                             </div>
                           </div>
-                          <span className="mt-2 text-sm text-gray-600">{data.month}</span>
+                          <span className={styles.chartLabel}>{data.month}</span>
                         </div>
                       );
                     })}
@@ -277,41 +260,45 @@ export default function AdminDashboard() {
               </div>
 
               {/* 위험 지역 요약 테이블 */}
-              <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6">
-                <h3 className="mb-4 text-lg font-bold text-gray-800">위험 지역 요약</h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
+              <div className={styles.tableCard}>
+                <h3>위험 지역 요약</h3>
+                <div className={styles.tableWrapper}>
+                  <table className={styles.table}>
                     <thead>
-                      <tr className="border-b border-gray-200 bg-gray-50">
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                      <tr>
+                        <th>
                           지역명
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        <th>
                           예상량
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        <th>
                           위험도
                         </th>
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                        <th>
                           조치사항
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       {riskAreas.map(area => (
-                        <tr key={area.id} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="px-4 py-4 text-sm text-gray-800">{area.region}</td>
-                          <td className="px-4 py-4 text-sm font-medium text-gray-900">
+                        <tr key={area.id}>
+                          <td>{area.region}</td>
+                          <td className={styles.fontMedium}>
                             {area.amount}
                           </td>
-                          <td className="px-4 py-4">
+                          <td>
                             <span
-                              className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${area.riskColor}`}
+                              className={`${styles.badge} ${
+                                area.risk === '높음' ? styles.red :
+                                area.risk === '중간' ? styles.yellow :
+                                styles.blue
+                              }`}
                             >
                               {area.risk}
                             </span>
                           </td>
-                          <td className="px-4 py-4 text-sm text-gray-700">{area.action}</td>
+                          <td>{area.action}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -320,36 +307,36 @@ export default function AdminDashboard() {
               </div>
 
               {/* 행정 전용 챗봇 */}
-              <div className="rounded-xl border border-gray-200 bg-white p-6">
-                <div className="mb-4 flex items-center gap-2">
-                  <ChatBubbleLeftRightIcon className="h-6 w-6 text-blue-600" />
-                  <h3 className="text-lg font-bold text-gray-800">행정 전용 챗봇</h3>
+              <div className={styles.chatbotCard}>
+                <div className={styles.chatbotHeader}>
+                  <ChatBubbleLeftRightIcon />
+                  <h3>행정 전용 챗봇</h3>
                 </div>
 
                 {/* 빠른 작업 버튼 */}
-                <div className="mb-4 flex flex-wrap gap-3">
-                  <button className="rounded-lg bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-100">
+                <div className={styles.quickActions}>
+                  <button className={`${styles.quickActionButton} ${styles.primary}`}>
                     📝 간단 보고서 작성
                   </button>
-                  <button className="rounded-lg bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100">
+                  <button className={`${styles.quickActionButton} ${styles.secondary}`}>
                     💾 데이터 다운로드 요청
                   </button>
                 </div>
 
                 {/* 채팅 입력 */}
-                <form onSubmit={handleChatSubmit} className="flex gap-2">
+                <form onSubmit={handleChatSubmit} className={styles.chatForm}>
                   <input
                     type="text"
                     value={chatMessage}
                     onChange={e => setChatMessage(e.target.value)}
                     placeholder="궁금한 내용을 입력하세요..."
-                    className="flex-1 rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                    className={styles.chatInput}
                   />
                   <button
                     type="submit"
-                    className="flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-700"
+                    className={styles.chatSubmit}
                   >
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -363,49 +350,120 @@ export default function AdminDashboard() {
             </>
           )}
 
+          {/* 보고서 생성 섹션 */}
+          {activeMenu === 'reports' && (
+            <>
+              <div className={styles.reportHeader}>
+                <h2 className={styles.reportTitle}>2025년 12월 해양쓰레기 예측 보고서</h2>
+                <div className={styles.reportActions}>
+                  <button className={`${styles.reportButton} ${styles.edit}`}>
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    편집
+                  </button>
+                  <button 
+                    className={`${styles.reportButton} ${styles.download}`}
+                    onClick={() => {
+                      const link = document.createElement('a');
+                      link.href = pdfUrl;
+                      link.download = '해양쓰레기_예측보고서_2025_12.pdf';
+                      link.click();
+                    }}
+                  >
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    다운로드 (PDF)
+                  </button>
+                  <button className={`${styles.reportButton} ${styles.download}`}>
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    다운로드 (DOCX)
+                  </button>
+                  <button 
+                    className={`${styles.reportButton} ${styles.print}`}
+                    onClick={() => {
+                      const iframe = document.querySelector('iframe');
+                      if (iframe?.contentWindow) {
+                        iframe.contentWindow.print();
+                      }
+                    }}
+                  >
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    인쇄
+                  </button>
+                </div>
+                <div className={styles.reportDate}>생성일: 2025.12.10</div>
+              </div>
+
+              <div className={styles.pdfViewerContainer}>
+                <iframe
+                  src={pdfUrl}
+                  className={styles.pdfViewer}
+                  title="보고서 PDF 뷰어"
+                />
+                <div className={styles.pdfPlaceholder}>
+                  <svg className={styles.pdfIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                  <p className={styles.pdfPlaceholderText}>
+                    PDF 보고서를 로드하는 중...
+                  </p>
+                  <p className={styles.pdfPlaceholderSubtext}>
+                    실제 환경에서는 백엔드 API에서 생성된 PDF가 표시됩니다.
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+
           {/* 방문객 통계 섹션 */}
           {activeMenu === 'visitors' && (
             <>
-              <div className="mb-6">
-                <h2 className="mb-2 text-2xl font-bold text-gray-800">
+              <div className={styles.sectionTitle}>
+                <h2>
                   해안별 방문객 통계 (2024.01 ~ 2025.10)
                 </h2>
-                <p className="text-gray-600">
+                <p>
                   제주도 주요 해안 지역의 월별 방문객 추이를 확인할 수 있습니다
                 </p>
               </div>
 
               {/* 요약 카드 */}
-              <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-4">
-                <div className="rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100 p-6">
-                  <h3 className="mb-2 text-sm font-semibold text-blue-600">총 방문객 수</h3>
-                  <p className="text-3xl font-bold text-blue-900">약 2.8억명</p>
-                  <p className="mt-1 text-xs text-blue-600">22개월 누적</p>
+              <div className={styles.statsGrid}>
+                <div className={`${styles.statsCard} ${styles.variant1}`}>
+                  <h3>총 방문객 수</h3>
+                  <p className={styles.statsValue}>약 2.8억명</p>
+                  <p className={styles.statsSubtext}>22개월 누적</p>
                 </div>
-                <div className="rounded-xl border border-green-200 bg-gradient-to-br from-green-50 to-green-100 p-6">
-                  <h3 className="mb-2 text-sm font-semibold text-green-600">최다 방문 해안</h3>
-                  <p className="text-2xl font-bold text-green-900">애월해안</p>
-                  <p className="mt-1 text-xs text-green-600">2,400만명 방문</p>
+                <div className={`${styles.statsCard} ${styles.variant2}`}>
+                  <h3>최다 방문 해안</h3>
+                  <p className={styles.statsValue}>애월해안</p>
+                  <p className={styles.statsSubtext}>2,400만명 방문</p>
                 </div>
-                <div className="rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-purple-100 p-6">
-                  <h3 className="mb-2 text-sm font-semibold text-purple-600">평균 월 방문객</h3>
-                  <p className="text-3xl font-bold text-purple-900">1,280만명</p>
-                  <p className="mt-1 text-xs text-purple-600">전체 해안 평균</p>
+                <div className={`${styles.statsCard} ${styles.variant3}`}>
+                  <h3>평균 월 방문객</h3>
+                  <p className={styles.statsValue}>1,280만명</p>
+                  <p className={styles.statsSubtext}>전체 해안 평균</p>
                 </div>
-                <div className="rounded-xl border border-orange-200 bg-gradient-to-br from-orange-50 to-orange-100 p-6">
-                  <h3 className="mb-2 text-sm font-semibold text-orange-600">성수기</h3>
-                  <p className="text-2xl font-bold text-orange-900">7-8월</p>
-                  <p className="mt-1 text-xs text-orange-600">평균 1,650만명/월</p>
+                <div className={`${styles.statsCard} ${styles.variant4}`}>
+                  <h3>성수기</h3>
+                  <p className={styles.statsValue}>7-8월</p>
+                  <p className={styles.statsSubtext}>평균 1,650만명/월</p>
                 </div>
               </div>
 
               {/* 지역별 최근 12개월 차트 */}
-              <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6">
-                <h3 className="mb-6 text-lg font-bold text-gray-800">
+              <div className={styles.chartCard}>
+                <h3>
                   제주 해안별 월별 방문객 추이 (2024.01 ~ 2025.10)
                 </h3>
-                <div className="overflow-x-auto">
-                  <div className="min-w-[1200px]">
+                <div className={styles.svgChartContainer}>
+                  <div className={styles.svgChartInner}>
                     {/* SVG 라인 차트 */}
                     <svg width="1200" height="400" className="mx-auto">
                       <defs>
@@ -620,7 +678,7 @@ export default function AdminDashboard() {
                     </svg>
 
                     {/* 범례 */}
-                    <div className="mt-6 flex flex-wrap justify-center gap-4">
+                    <div className={styles.legend}>
                       {[
                         { name: '조천해안', color: '#06b6d4' },
                         { name: '애월해안', color: '#ef4444' },
@@ -632,12 +690,12 @@ export default function AdminDashboard() {
                         { name: '구좌해안', color: '#ec4899' },
                         { name: '남원해안', color: '#14b8a6' },
                       ].map(legend => (
-                        <div key={legend.name} className="flex items-center gap-2">
+                        <div key={legend.name} className={styles.legendItem}>
                           <div
-                            className="h-4 w-4 rounded-full"
+                            className={styles.legendColor}
                             style={{ backgroundColor: legend.color }}
                           ></div>
-                          <span className="text-sm font-medium text-gray-700">{legend.name}</span>
+                          <span className={styles.legendLabel}>{legend.name}</span>
                         </div>
                       ))}
                     </div>
@@ -646,48 +704,48 @@ export default function AdminDashboard() {
               </div>
 
               {/* 지역별 상세 테이블 */}
-              <div className="rounded-xl border border-gray-200 bg-white p-6">
-                <h3 className="mb-4 text-lg font-bold text-gray-800">
+              <div className={styles.tableCard}>
+                <h3>
                   해안별 상세 방문객 데이터 (2025년)
                 </h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
+                <div className={styles.tableWrapper}>
+                  <table className={styles.table}>
                     <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                      <tr>
+                        <th>
                           해안명
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className={styles.alignRight}>
                           2025.01
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className={styles.alignRight}>
                           2025.02
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className={styles.alignRight}>
                           2025.03
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className={styles.alignRight}>
                           2025.04
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className={styles.alignRight}>
                           2025.05
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className={styles.alignRight}>
                           2025.06
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className={styles.alignRight}>
                           2025.07
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className={styles.alignRight}>
                           2025.08
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className={styles.alignRight}>
                           2025.09
                         </th>
-                        <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className={styles.alignRight}>
                           2025.10
                         </th>
-                        <th className="bg-blue-50 px-4 py-3 text-right text-sm font-semibold text-gray-700">
+                        <th className={`${styles.alignRight} ${styles.highlight}`}>
                           합계
                         </th>
                       </tr>
@@ -749,16 +807,16 @@ export default function AdminDashboard() {
                           data: [0, 0, 0, 394638, 480801, 503558, 654161, 762264, 455047, 513333],
                         },
                       ].map((region, idx) => (
-                        <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm font-medium text-gray-800">
+                        <tr key={idx}>
+                          <td>
                             {region.name}
                           </td>
                           {region.data.map((value, i) => (
-                            <td key={i} className="px-4 py-3 text-right text-sm text-gray-600">
+                            <td key={i} className={styles.alignRight}>
                               {value === 0 ? '-' : (value / 10000).toFixed(1) + '만'}
                             </td>
                           ))}
-                          <td className="bg-blue-50 px-4 py-3 text-right text-sm font-bold text-blue-600">
+                          <td className={`${styles.alignRight} ${styles.highlight}`}>
                             {(region.data.reduce((a, b) => a + b, 0) / 10000).toFixed(0)}만
                           </td>
                         </tr>
