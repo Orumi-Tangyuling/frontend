@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Cookies from 'js-cookie';
 import Link from 'next/link';
@@ -16,6 +16,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 이미 로그인된 상태면 dashboard로 리다이렉트
+  useEffect(() => {
+    const accessToken = Cookies.get('access_token');
+    if (accessToken) {
+      router.push('/dashboard');
+    }
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
