@@ -66,7 +66,9 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [dataError, setDataError] = useState<string | null>(null);
-  const [pdfUrl, setPdfUrl] = useState('/sample-report.pdf'); // 더미 PDF URL
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
 
   // JWT 인증 확인
   useEffect(() => {
@@ -136,6 +138,106 @@ export default function AdminDashboard() {
     console.log('Chat message:', chatMessage);
     setChatMessage('');
   };
+
+  // PDF 보고서 생성 함수
+  const generatePdfReport = async () => {
+    setPdfLoading(true);
+    setPdfError(null);
+    
+    try {
+      const apiHost = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:8000';
+      const accessToken = Cookies.get('access_token');
+      
+      const response = await fetch(`${apiHost}/api/v1/report/monthly`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          organization_name: '해양환경공단'
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          Cookies.remove('access_token');
+          Cookies.remove('token_type');
+          Cookies.remove('username');
+          router.push('/login');
+          return;
+        }
+        throw new Error('보고서 생성에 실패했습니다.');
+      }
+
+      // PDF Blob 생성
+      const blob = await response.blob();
+      
+      // 기존 URL이 있으면 해제
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+      
+      // 새로운 URL 생성
+      const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
+    } catch (err) {
+      console.error('PDF 생성 오류:', err);
+      setPdfError(err instanceof Error ? err.message : 'PDF 생성에 실패했습니다.');
+    } finally {
+      setPdfLoading(false);
+    }
+  };
+
+  // PDF 다운로드 함수
+  const downloadPdfReport = async () => {
+    try {
+      const apiHost = process.env.NEXT_PUBLIC_API_HOST || 'http://localhost:8000';
+      const accessToken = Cookies.get('access_token');
+      
+      const response = await fetch(`${apiHost}/api/v1/report/monthly`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          organization_name: '해양환경공단'
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('보고서 다운로드에 실패했습니다.');
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `해양쓰레기_예측보고서_${dashboardData?.target_month || new Date().toISOString().slice(0, 7)}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('PDF 다운로드 오류:', err);
+      alert(err instanceof Error ? err.message : 'PDF 다운로드에 실패했습니다.');
+    }
+  };
+
+  // 보고서 섹션이 활성화될 때 PDF 자동 생성
+  useEffect(() => {
+    if (activeMenu === 'reports' && !pdfUrl && !pdfLoading && !pdfError) {
+      generatePdfReport();
+    }
+  }, [activeMenu]);
+
+  // 컴포넌트 언마운트 시 URL 해제
+  useEffect(() => {
+    return () => {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+    };
+  }, [pdfUrl]);
 
   // 로딩 중이거나 인증되지 않은 경우
   if (isLoading || !isAuthenticated) {
@@ -522,33 +624,29 @@ export default function AdminDashboard() {
           {activeMenu === 'reports' && (
             <>
               <div className={styles.reportHeader}>
-                <h2 className={styles.reportTitle}>2025년 12월 해양쓰레기 예측 보고서</h2>
+                <h2 className={styles.reportTitle}>
+                  {dashboardData?.target_month || new Date().toISOString().slice(0, 7)} 해양쓰레기 예측 보고서
+                </h2>
                 <div className={styles.reportActions}>
-                  <button className={`${styles.reportButton} ${styles.edit}`}>
+                  <button 
+                    className={`${styles.reportButton} ${styles.edit}`}
+                    onClick={generatePdfReport}
+                    disabled={pdfLoading}
+                  >
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    편집
+                    {pdfLoading ? '생성 중...' : '새로고침'}
                   </button>
                   <button 
                     className={`${styles.reportButton} ${styles.download}`}
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = pdfUrl;
-                      link.download = '해양쓰레기_예측보고서_2025_12.pdf';
-                      link.click();
-                    }}
+                    onClick={downloadPdfReport}
+                    disabled={pdfLoading || !pdfUrl}
                   >
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     다운로드 (PDF)
-                  </button>
-                  <button className={`${styles.reportButton} ${styles.download}`}>
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    다운로드 (DOCX)
                   </button>
                   <button 
                     className={`${styles.reportButton} ${styles.print}`}
@@ -558,6 +656,7 @@ export default function AdminDashboard() {
                         iframe.contentWindow.print();
                       }
                     }}
+                    disabled={pdfLoading || !pdfUrl}
                   >
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -565,26 +664,62 @@ export default function AdminDashboard() {
                     인쇄
                   </button>
                 </div>
-                <div className={styles.reportDate}>생성일: 2025.12.10</div>
+                <div className={styles.reportDate}>
+                  생성일: {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\. /g, '.').replace(/\.$/, '')}
+                </div>
               </div>
 
               <div className={styles.pdfViewerContainer}>
-                <iframe
-                  src={pdfUrl}
-                  className={styles.pdfViewer}
-                  title="보고서 PDF 뷰어"
-                />
-                <div className={styles.pdfPlaceholder}>
-                  <svg className={styles.pdfIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
-                  <p className={styles.pdfPlaceholderText}>
-                    PDF 보고서를 로드하는 중...
-                  </p>
-                  <p className={styles.pdfPlaceholderSubtext}>
-                    실제 환경에서는 백엔드 API에서 생성된 PDF가 표시됩니다.
-                  </p>
-                </div>
+                {pdfLoading && (
+                  <div className={styles.pdfPlaceholder}>
+                    <div className="mb-4 h-16 w-16 animate-spin rounded-full border-4 border-gray-300 border-t-blue-500 mx-auto"></div>
+                    <p className={styles.pdfPlaceholderText}>
+                      PDF 보고서를 생성하는 중...
+                    </p>
+                    <p className={styles.pdfPlaceholderSubtext}>
+                      잠시만 기다려주세요.
+                    </p>
+                  </div>
+                )}
+                {pdfError && (
+                  <div className={styles.pdfPlaceholder}>
+                    <svg className={styles.pdfIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: '#ef4444' }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className={styles.pdfPlaceholderText} style={{ color: '#ef4444' }}>
+                      {pdfError}
+                    </p>
+                    <button
+                      onClick={generatePdfReport}
+                      className="mt-4 rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 transition-colors"
+                    >
+                      다시 시도
+                    </button>
+                  </div>
+                )}
+                {!pdfLoading && !pdfError && pdfUrl && (
+                  <iframe
+                    src={pdfUrl}
+                    className={styles.pdfViewer}
+                    title="보고서 PDF 뷰어"
+                  />
+                )}
+                {!pdfLoading && !pdfError && !pdfUrl && (
+                  <div className={styles.pdfPlaceholder}>
+                    <svg className={styles.pdfIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    <p className={styles.pdfPlaceholderText}>
+                      보고서를 생성해주세요
+                    </p>
+                    <button
+                      onClick={generatePdfReport}
+                      className="mt-4 rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700 transition-colors"
+                    >
+                      보고서 생성
+                    </button>
+                  </div>
+                )}
               </div>
             </>
           )}
