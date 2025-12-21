@@ -16,13 +16,13 @@ jobs:
         run: sh ./build.sh
       - name: Pushes to another repository
         id: push_directory
-        uses: cpina/github-action-push-to-another-repository@main
+        uses: sinryuji/tangyuling-frontend@main
         env:
           API_TOKEN_GITHUB: ${{ secrets.TOKEN_KEY }}
         with:
           source-directory: 'output'
-          destination-github-username: your-github-username
-          destination-repository-name: your-github-repository-name
+          destination-github-username: sinryujui
+          destination-repository-name: tangyuling-frontend
           user-email: ${{ secrets.ACCOUNT_EMAIL }}
           commit-message: ${{ github.event.commits[0].message }}
           target-branch: main
