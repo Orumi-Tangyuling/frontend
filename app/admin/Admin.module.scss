@@ -139,6 +139,45 @@ $white: #ffffff;
   }
 }
 
+.subMenuButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+  margin-left: 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid $gray-200;
+}
+
+.subNavButton {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  transition: all 0.2s;
+  color: $gray-600;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-align: left;
+
+  &:hover {
+    background-color: $gray-50;
+    color: $gray-700;
+  }
+
+  &.active {
+    background-color: $blue-50;
+    color: $blue-600;
+    font-weight: 500;
+  }
+}
+
 // Logout
 .logoutSection {
   border-top: 1px solid $gray-200;

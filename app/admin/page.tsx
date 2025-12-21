@@ -5,7 +5,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 import {
-  ArrowDownTrayIcon,
   ArrowTrendingUpIcon,
   ChartBarIcon,
   ChatBubbleLeftRightIcon,
@@ -19,6 +18,7 @@ import styles from './Admin.module.scss';
 
 export default function AdminDashboard() {
   const [activeMenu, setActiveMenu] = useState('statistics');
+  const [activeSubMenu, setActiveSubMenu] = useState('monthly-prediction');
   const [chatMessage, setChatMessage] = useState('');
   const [pdfUrl, setPdfUrl] = useState('/sample-report.pdf'); // 더미 PDF URL
 
@@ -83,8 +83,8 @@ export default function AdminDashboard() {
         {/* 로고 */}
         <div className={styles.logoSection}>
           <div className={styles.logoContent}>
-            <img src="/logo.png" alt="깨끗해양" className={styles.logoImage} />
-            <span className={styles.logoText}>깨끗해양</span>
+            <img src="/logo.png" alt="깨끗海" className={styles.logoImage} />
+            <span className={styles.logoText}>깨끗海</span>
           </div>
         </div>
 
@@ -102,6 +102,26 @@ export default function AdminDashboard() {
                 <ChartBarIcon />
                 <span>통계</span>
               </button>
+              {activeMenu === 'statistics' && (
+                <div className={styles.subMenuButtons}>
+                  <button
+                    onClick={() => setActiveSubMenu('monthly-prediction')}
+                    className={`${styles.subNavButton} ${
+                      activeSubMenu === 'monthly-prediction' ? styles.active : ''
+                    }`}
+                  >
+                    <span>월간 예측 대시보드</span>
+                  </button>
+                  <button
+                    onClick={() => setActiveSubMenu('visitor-stats')}
+                    className={`${styles.subNavButton} ${
+                      activeSubMenu === 'visitor-stats' ? styles.active : ''
+                    }`}
+                  >
+                    <span>방문객 통계</span>
+                  </button>
+                </div>
+              )}
               <button
                 onClick={() => setActiveMenu('reports')}
                 className={`${styles.navButton} ${
@@ -110,24 +130,6 @@ export default function AdminDashboard() {
               >
                 <DocumentTextIcon />
                 <span>보고서 생성</span>
-              </button>
-              <button
-                onClick={() => setActiveMenu('download')}
-                className={`${styles.navButton} ${
-                  activeMenu === 'download' ? styles.active : ''
-                }`}
-              >
-                <ArrowDownTrayIcon />
-                <span>데이터 다운로드</span>
-              </button>
-              <button
-                onClick={() => setActiveMenu('visitors')}
-                className={`${styles.navButton} ${
-                  activeMenu === 'visitors' ? styles.active : ''
-                }`}
-              >
-                <MapPinIcon />
-                <span>방문객 통계</span>
               </button>
             </div>
           </div>
@@ -160,7 +162,7 @@ export default function AdminDashboard() {
         </header>
 
         <div className={styles.contentArea}>
-          {activeMenu === 'statistics' && (
+          {activeMenu === 'statistics' && activeSubMenu === 'monthly-prediction' && (
             <>
               {/* 타이틀 */}
               <div className={styles.sectionTitle}>
@@ -422,7 +424,7 @@ export default function AdminDashboard() {
           )}
 
           {/* 방문객 통계 섹션 */}
-          {activeMenu === 'visitors' && (
+          {activeMenu === 'statistics' && activeSubMenu === 'visitor-stats' && (
             <>
               <div className={styles.sectionTitle}>
                 <h2>

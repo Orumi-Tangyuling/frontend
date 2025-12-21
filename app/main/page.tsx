@@ -60,7 +60,7 @@ export default function DashboardPage() {
               filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.3)) drop-shadow(0 4px 12px rgba(34, 211, 238, 0.3))',
             }}
           >
-            🌊 제주 해양환경 예측 서비스
+            제주 해양환경 예측 서비스
           </h1>
           <Link
             href={isLoggedIn ? "/dashboard" : "/login"}
@@ -78,7 +78,7 @@ export default function DashboardPage() {
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                로그인
+                행정 담당자 로그인
               </>
             )}
           </Link>
