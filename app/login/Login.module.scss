@@ -1,0 +1,343 @@
+// Colors
+$gray-50: #f9fafb;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$gray-900: #111827;
+$blue-500: #3b82f6;
+$blue-600: #2563eb;
+$yellow-300: #fcd34d;
+$white: #ffffff;
+
+// Container
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+// Left Illustration Section
+.illustrationSection {
+  position: relative;
+  overflow: hidden;
+  background-color: $white;
+  display: none;
+
+  @media (min-width: 1024px) {
+    display: flex;
+    width: 50%;
+  }
+}
+
+.illustrationContent {
+  position: relative;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.cloudTop {
+  position: absolute;
+  top: 5rem;
+  left: 4rem;
+
+  svg {
+    width: 100px;
+    height: 40px;
+    color: $gray-300;
+  }
+}
+
+.cloudRight {
+  position: absolute;
+  top: 4rem;
+  right: 8rem;
+
+  svg {
+    width: 120px;
+    height: 50px;
+    color: $gray-300;
+  }
+}
+
+.logoSection {
+  z-index: 10;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.logoWrapper {
+  position: relative;
+  margin-bottom: 1rem;
+  display: inline-block;
+
+  svg {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.logoTitle {
+  margin-bottom: 0.5rem;
+  font-size: 3rem;
+  font-weight: 700;
+  color: $gray-800;
+}
+
+.logoSubtitle {
+  font-size: 1.125rem;
+  color: $gray-600;
+}
+
+.illustrationWrapper {
+  position: relative;
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 28rem;
+}
+
+.lighthouse {
+  position: absolute;
+  top: 0;
+  right: 25%;
+  z-index: 20;
+}
+
+.oceanSvg {
+  width: 100%;
+}
+
+.bottomText {
+  position: absolute;
+  bottom: 3rem;
+  text-align: center;
+
+  p {
+    font-size: 0.875rem;
+    color: $gray-500;
+  }
+}
+
+// Right Login Form Section
+.formSection {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  background-color: $gray-50;
+  padding: 2rem;
+
+  @media (min-width: 1024px) {
+    width: 50%;
+  }
+}
+
+.formWrapper {
+  width: 100%;
+  max-width: 28rem;
+}
+
+.formCard {
+  border-radius: 1.5rem;
+  border: 1px solid $gray-200;
+  background-color: $white;
+  padding: 2.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.formTitle {
+  margin-bottom: 2rem;
+  text-align: center;
+  font-size: 1.875rem;
+  font-weight: 700;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: $gray-700;
+  }
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.inputIcon {
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 1rem;
+
+  svg {
+    height: 1.25rem;
+    width: 1.25rem;
+    color: $gray-400;
+  }
+}
+
+.input {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid $gray-300;
+  padding: 0.75rem 1rem 0.75rem 3rem;
+  transition: all 0.2s;
+  outline: none;
+  font-family: inherit;
+
+  &:focus {
+    border-color: transparent;
+    box-shadow: 0 0 0 2px $blue-500;
+  }
+
+  &::placeholder {
+    color: $gray-400;
+  }
+
+  &.withRightIcon {
+    padding-right: 3rem;
+  }
+}
+
+.toggleButton {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding-right: 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  svg {
+    height: 1.25rem;
+    width: 1.25rem;
+    color: $gray-400;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $gray-600;
+    }
+  }
+}
+
+.checkboxWrapper {
+  display: flex;
+  align-items: center;
+
+  input[type='checkbox'] {
+    height: 1rem;
+    width: 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid $gray-300;
+    color: $blue-600;
+    cursor: pointer;
+
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+    }
+  }
+
+  label {
+    margin-left: 0.5rem;
+    font-size: 0.875rem;
+    color: $gray-700;
+    cursor: pointer;
+  }
+}
+
+.submitButton {
+  width: 100%;
+  border-radius: 0.75rem;
+  background-color: $gray-900;
+  padding: 0.75rem;
+  font-weight: 500;
+  color: $white;
+  transition: background-color 0.2s;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+
+  &:hover {
+    background-color: $gray-800;
+  }
+}
+
+.linksWrapper {
+  text-align: center;
+  font-size: 0.875rem;
+
+  a {
+    color: $gray-600;
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $gray-900;
+    }
+  }
+
+  .separator {
+    margin: 0 0.5rem;
+    color: $gray-400;
+  }
+}
+
+.notice {
+  margin-top: 1.5rem;
+  text-align: center;
+
+  p {
+    border-radius: 0.5rem;
+    background-color: $gray-50;
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem;
+    color: $gray-500;
+  }
+}
+
+.backLink {
+  margin-top: 1.5rem;
+  text-align: center;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: $gray-600;
+    text-decoration: none;
+    transition: color 0.2s;
+
+    svg {
+      height: 1rem;
+      width: 1rem;
+    }
+
+    &:hover {
+      color: $gray-900;
+    }
+  }
+}

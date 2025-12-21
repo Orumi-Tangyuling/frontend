@@ -24,7 +24,8 @@
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "react-leaflet": "^5.0.0",
-    "react-map-gl": "^8.1.0"
+    "react-map-gl": "^8.1.0",
+    "sass": "^1.97.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

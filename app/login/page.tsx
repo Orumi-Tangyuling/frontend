@@ -6,6 +6,8 @@ import Cookies from 'js-cookie';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import styles from './Login.module.scss';
+
 export default function LoginPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
@@ -65,13 +67,13 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className={styles.container}>
       {/* 왼쪽 일러스트 섹션 */}
-      <div className="relative hidden overflow-hidden bg-white lg:flex lg:w-1/2">
-        <div className="relative flex h-full w-full flex-col items-center justify-center p-12">
+      <div className={styles.illustrationSection}>
+        <div className={styles.illustrationContent}>
           {/* 구름 장식 */}
-          <div className="absolute top-20 left-16">
-            <svg width="100" height="40" viewBox="0 0 100 40" className="text-gray-300">
+          <div className={styles.cloudTop}>
+            <svg width="100" height="40" viewBox="0 0 100 40">
               <path
                 d="M20 30 Q10 30 10 20 Q10 10 20 10 Q25 5 35 10 Q45 10 45 20 Q45 30 35 30 Z"
                 fill="none"
@@ -80,8 +82,8 @@ export default function LoginPage() {
               />
             </svg>
           </div>
-          <div className="absolute top-16 right-32">
-            <svg width="120" height="50" viewBox="0 0 120 50" className="text-gray-300">
+          <div className={styles.cloudRight}>
+            <svg width="120" height="50" viewBox="0 0 120 50">
               <path
                 d="M25 35 Q15 35 15 25 Q15 15 25 15 Q30 10 40 15 Q50 15 50 25 Q50 35 40 35 Z"
                 fill="none"
@@ -92,9 +94,9 @@ export default function LoginPage() {
           </div>
 
           {/* 메인 로고 */}
-          <div className="z-10 mb-8 text-center">
-            <div className="relative mb-4 inline-block">
-              <svg width="80" height="40" viewBox="0 0 80 40" className="mb-2">
+          <div className={styles.logoSection}>
+            <div className={styles.logoWrapper}>
+              <svg width="80" height="40" viewBox="0 0 80 40">
                 <path
                   d="M10 20 Q20 5 30 20 Q40 5 50 20 Q60 5 70 20"
                   fill="none"
@@ -104,14 +106,14 @@ export default function LoginPage() {
                 />
               </svg>
             </div>
-            <h1 className="mb-2 text-5xl font-bold text-gray-800">깨끗해양</h1>
-            <p className="text-lg text-gray-600">제주 해양환경 예측 서비스</p>
+            <h1 className={styles.logoTitle}>깨끗해양</h1>
+            <p className={styles.logoSubtitle}>제주 해양환경 예측 서비스</p>
           </div>
 
           {/* 등대와 바다 일러스트 */}
-          <div className="relative mt-8 w-full max-w-md">
+          <div className={styles.illustrationWrapper}>
             {/* 등대 */}
-            <div className="absolute top-0 right-1/4 z-20">
+            <div className={styles.lighthouse}>
               <svg width="80" height="140" viewBox="0 0 80 140">
                 <rect x="30" y="20" width="20" height="60" fill="#9CA3AF" rx="2" />
                 <rect x="28" y="75" width="24" height="8" fill="#6B7280" />
@@ -122,7 +124,7 @@ export default function LoginPage() {
             </div>
 
             {/* 바다 파도 */}
-            <svg width="400" height="200" viewBox="0 0 400 200" className="w-full">
+            <svg width="400" height="200" viewBox="0 0 400 200" className={styles.oceanSvg}>
               {/* 수평선 */}
               <line x1="0" y1="100" x2="400" y2="100" stroke="#D1D5DB" strokeWidth="2" />
 
@@ -166,26 +168,26 @@ export default function LoginPage() {
           </div>
 
           {/* 하단 텍스트 */}
-          <div className="absolute bottom-12 text-center">
-            <p className="text-sm text-gray-500">행정 담당자 전용 시스템</p>
+          <div className={styles.bottomText}>
+            <p>행정 담당자 전용 시스템</p>
           </div>
         </div>
       </div>
 
       {/* 오른쪽 로그인 폼 섹션 */}
-      <div className="flex w-full items-center justify-center bg-gray-50 p-8 lg:w-1/2">
-        <div className="w-full max-w-md">
+      <div className={styles.formSection}>
+        <div className={styles.formWrapper}>
           {/* 로그인 폼 카드 */}
-          <div className="rounded-3xl border border-gray-200 bg-white p-10 shadow-lg">
-            <h2 className="mb-8 text-center text-3xl font-bold">행정 로그인</h2>
+          <div className={styles.formCard}>
+            <h2 className={styles.formTitle}>행정 로그인</h2>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className={styles.form}>
               {/* 에러 메시지 */}
               {error && (
-                <div className="rounded-lg bg-red-50 p-4 text-sm text-red-800">
-                  <div className="flex">
+                <div className={styles.errorMessage}>
+                  <div className={styles.errorContent}>
                     <svg
-                      className="h-5 w-5 text-red-400"
+                      className={styles.errorIcon}
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -195,18 +197,17 @@ export default function LoginPage() {
                         clipRule="evenodd"
                       />
                     </svg>
-                    <span className="ml-3">{error}</span>
+                    <span className={styles.errorText}>{error}</span>
                   </div>
                 </div>
               )}
 
               {/* 아이디 입력 */}
-              <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">아이디</label>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+              <div className={styles.inputGroup}>
+                <label>아이디</label>
+                <div className={styles.inputWrapper}>
+                  <div className={styles.inputIcon}>
                     <svg
-                      className="h-5 w-5 text-gray-400"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -224,18 +225,17 @@ export default function LoginPage() {
                     value={username}
                     onChange={e => setUsername(e.target.value)}
                     placeholder="아이디를 입력하세요"
-                    className="w-full rounded-xl border border-gray-300 py-3 pr-4 pl-12 transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                    className={styles.input}
                   />
                 </div>
               </div>
 
               {/* 비밀번호 입력 */}
-              <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">비밀번호</label>
-                <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+              <div className={styles.inputGroup}>
+                <label>비밀번호</label>
+                <div className={styles.inputWrapper}>
+                  <div className={styles.inputIcon}>
                     <svg
-                      className="h-5 w-5 text-gray-400"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -253,16 +253,15 @@ export default function LoginPage() {
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="비밀번호를 입력하세요"
-                    className="w-full rounded-xl border border-gray-300 py-3 pr-12 pl-12 transition-all outline-none focus:border-transparent focus:ring-2 focus:ring-blue-500"
+                    className={`${styles.input} ${styles.withRightIcon}`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-0 flex items-center pr-4"
+                    className={styles.toggleButton}
                   >
                     {showPassword ? (
                       <svg
-                        className="h-5 w-5 text-gray-400 hover:text-gray-600"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -276,7 +275,6 @@ export default function LoginPage() {
                       </svg>
                     ) : (
                       <svg
-                        className="h-5 w-5 text-gray-400 hover:text-gray-600"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -300,15 +298,14 @@ export default function LoginPage() {
               </div>
 
               {/* 로그인 상태 유지 체크박스 */}
-              <div className="flex items-center">
+              <div className={styles.checkboxWrapper}>
                 <input
                   type="checkbox"
                   id="keepLoggedIn"
                   checked={keepLoggedIn}
                   onChange={e => setKeepLoggedIn(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <label htmlFor="keepLoggedIn" className="ml-2 text-sm text-gray-700">
+                <label htmlFor="keepLoggedIn">
                   로그인 상태 유지
                 </label>
               </div>
@@ -317,7 +314,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full rounded-xl bg-gray-900 py-3 font-medium text-white transition-colors duration-200 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                className={`${styles.submitButton} ${isLoading ? styles.loading : ''}`}
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -348,32 +345,31 @@ export default function LoginPage() {
               </button>
 
               {/* 비밀번호 찾기 / 계정 문의 */}
-              <div className="text-center text-sm">
-                <a href="#" className="text-gray-600 hover:text-gray-900">
+              <div className={styles.linksWrapper}>
+                <a href="#">
                   비밀번호 찾기
                 </a>
-                <span className="mx-2 text-gray-400">|</span>
-                <a href="#" className="text-gray-600 hover:text-gray-900">
+                <span className={styles.separator}>|</span>
+                <a href="#">
                   계정 문의
                 </a>
               </div>
             </form>
 
             {/* 안내 문구 */}
-            <div className="mt-6 text-center">
-              <p className="rounded-lg bg-gray-50 px-4 py-3 text-xs text-gray-500">
+            <div className={styles.notice}>
+              <p>
                 행정 담당자만 접근 가능합니다
               </p>
             </div>
           </div>
 
           {/* 메인으로 돌아가기 */}
-          <div className="mt-6 text-center">
+          <div className={styles.backLink}>
             <Link
               href="/"
-              className="flex items-center justify-center gap-2 text-sm text-gray-600 hover:text-gray-900"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
