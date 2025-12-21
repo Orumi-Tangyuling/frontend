@@ -423,7 +423,7 @@ export default function AdminDashboard() {
               {/* 타이틀 */}
               <div className={styles.sectionTitle}>
                 <h2>
-                  월간 예측 대시보드 - {dashboardData.target_month}
+                  월간 예측 대시보드 - {dashboardData?.target_month}
                 </h2>
               </div>
 
@@ -433,12 +433,12 @@ export default function AdminDashboard() {
                 <div className={styles.statsCardSmall}>
                   <h3>총 예상 유입량</h3>
                   <div className={styles.statsValue}>
-                    <span className={styles.blue}>{dashboardData.summary.total_predicted_amount.toLocaleString()}개</span>
+                    <span className={styles.blue}>{dashboardData?.summary.total_predicted_amount.toLocaleString()}개</span>
                   </div>
                   <div className={styles.statsDetails}>
                     <span className={styles.label}>전월 대비</span>
-                    <span className={`${styles.value} ${dashboardData.summary.previous_month_change >= 0 ? styles.positive : styles.negative}`}>
-                      {dashboardData.summary.previous_month_change > 0 ? '+' : ''}{dashboardData.summary.previous_month_change}%
+                    <span className={`${styles.value} ${(dashboardData?.summary.previous_month_change ?? 0) >= 0 ? styles.positive : styles.negative}`}>
+                      {(dashboardData?.summary.previous_month_change ?? 0) > 0 ? '+' : ''}{dashboardData?.summary.previous_month_change ?? 0}%
                       <ArrowTrendingUpIcon />
                     </span>
                   </div>
@@ -448,11 +448,11 @@ export default function AdminDashboard() {
                 <div className={styles.statsCardSmall}>
                   <h3>위험 지역</h3>
                   <div className={styles.statsValue}>
-                    <span className={styles.red}>{dashboardData.summary.high_risk_count}개소</span>
+                    <span className={styles.red}>{dashboardData?.summary.high_risk_count}개소</span>
                   </div>
                   <div className={styles.statsDetails}>
                     <span className={styles.subvalue}>
-                      추적 지역: <span>{dashboardData.summary.medium_risk_count}개소</span>
+                      추적 지역: <span>{dashboardData?.summary.medium_risk_count}개소</span>
                     </span>
                   </div>
                 </div>
@@ -461,11 +461,11 @@ export default function AdminDashboard() {
                 <div className={styles.statsCardSmall}>
                   <h3>수거 계획 필요</h3>
                   <div className={styles.statsValue}>
-                    <span className={styles.orange}>즉시 조치 {dashboardData.summary.immediate_action_count}곳</span>
+                    <span className={styles.orange}>즉시 조치 {dashboardData?.summary.immediate_action_count}곳</span>
                   </div>
                   <div className={styles.statsDetails}>
                     <span className={styles.subvalue}>
-                      장기 점검 <span>{dashboardData.summary.regular_check_count}곳</span>
+                      장기 점검 <span>{dashboardData?.summary.regular_check_count}곳</span>
                     </span>
                   </div>
                 </div>
@@ -549,7 +549,7 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {dashboardData.risk_areas.map((area, index) => {
+                      {dashboardData?.risk_areas.map((area, index) => {
                         return (
                           <tr key={index}>
                             <td className={styles.textGray800}>{area.beach_name}</td>
@@ -725,7 +725,7 @@ export default function AdminDashboard() {
           )}
 
           {/* 방문객 통계 섹션 */}
-          {activeMenu === 'visitors' && dashboardData.visitor_stats && dashboardData.visitor_stats.length > 0 ? (
+          {activeMenu === 'visitors' && dashboardData?.visitor_stats && dashboardData.visitor_stats.length > 0 ? (
             <>
               <div className={styles.sectionTitle}>
                 <h2>
@@ -748,7 +748,7 @@ export default function AdminDashboard() {
                       const regionMap = new Map<string, Map<string, number>>();
                       const allMonths = new Set<string>();
                       
-                      dashboardData.visitor_stats.forEach(stat => {
+                      dashboardData?.visitor_stats.forEach(stat => {
                         if (!regionMap.has(stat.region)) {
                           regionMap.set(stat.region, new Map());
                         }
@@ -897,7 +897,7 @@ export default function AdminDashboard() {
                     {/* 범례 */}
                     <div className={styles.legend}>
                       {(() => {
-                        const regionNames = [...new Set(dashboardData.visitor_stats.map(s => s.region))];
+                        const regionNames = [...new Set(dashboardData?.visitor_stats.map(s => s.region) ?? [])];
                         const colors = [
                           '#06b6d4', '#ef4444', '#22c55e', '#a855f7', 
                           '#f59e0b', '#8b5cf6', '#eab308', '#ec4899', '#14b8a6'
@@ -936,7 +936,7 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody>
-                      {dashboardData.visitor_stats.map((stat, index) => (
+                      {dashboardData?.visitor_stats.map((stat, index) => (
                         <tr key={index}>
                           <td className={styles.fontMedium}>{stat.region}</td>
                           <td className={styles.textGray600}>{stat.year_month}</td>
