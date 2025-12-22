@@ -315,7 +315,7 @@ export default function AdminDashboard() {
                 className="rounded-full"
               />
             </div>
-            <span className={styles.logoText}>깨끗해양</span>
+            <span className={styles.logoText}>깨끗海</span>
           </div>
         </div>
 
