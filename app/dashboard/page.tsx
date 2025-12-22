@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 
 import Cookies from 'js-cookie';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -305,20 +306,14 @@ export default function AdminDashboard() {
         {/* 로고 */}
         <div className={styles.logoSection}>
           <div className={styles.logoContent}>
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
+            <div className="flex h-10 w-10 items-center justify-center">
+              <Image
+                src="/logo.png"
+                alt="깨끗해양 로고"
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
             </div>
             <span className={styles.logoText}>깨끗海</span>
           </div>
@@ -398,7 +393,7 @@ export default function AdminDashboard() {
             </div>
             <Link
               href="/main"
-              className="flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-600 transition-all hover:bg-blue-100 hover:border-blue-300"
+              className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition-all hover:bg-gray-50 hover:border-gray-400"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -565,48 +560,6 @@ export default function AdminDashboard() {
                     </tbody>
                   </table>
                 </div>
-              </div>
-
-              {/* 행정 전용 챗봇 */}
-              <div className={styles.chatbotCard}>
-                <div className={styles.chatbotHeader}>
-                  <ChatBubbleLeftRightIcon />
-                  <h3>행정 전용 챗봇</h3>
-                </div>
-
-                {/* 빠른 작업 버튼 */}
-                <div className={styles.quickActions}>
-                  <button className={`${styles.quickActionButton} ${styles.primary}`}>
-                    📝 간단 보고서 작성
-                  </button>
-                  <button className={`${styles.quickActionButton} ${styles.secondary}`}>
-                    💾 데이터 다운로드 요청
-                  </button>
-                </div>
-
-                {/* 채팅 입력 */}
-                <form onSubmit={handleChatSubmit} className={styles.chatForm}>
-                  <input
-                    type="text"
-                    value={chatMessage}
-                    onChange={e => setChatMessage(e.target.value)}
-                    placeholder="궁금한 내용을 입력하세요..."
-                    className={styles.chatInput}
-                  />
-                  <button
-                    type="submit"
-                    className={styles.chatSubmit}
-                  >
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                      />
-                    </svg>
-                  </button>
-                </form>
               </div>
             </>
           )}
