@@ -9,11 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     container: pandoc/latex
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install mustache (to update the date)
         run: apk add ruby && gem install mustache
-      - name: creates output
+      - name: Create output
         run: sh ./build.sh
+      - name: Inspect output
+        run: ls -la output
       - name: Pushes to another repository
         id: push_directory
         uses: cpina/github-action-push-to-another-repository@main
@@ -22,7 +24,8 @@ jobs:
         with:
           source-directory: 'output'
           destination-github-username: sinryuji
-          destination-repository-name: tangyuling-frontend
+          destination-repository-name: clean-coast-frontend
+          user-name: github-actions[bot]
           user-email: ${{ secrets.ACCOUNT_EMAIL }}
           commit-message: ${{ github.event.head_commit.message || 'Update from main branch' }}
           target-branch: main
