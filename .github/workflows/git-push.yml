@@ -22,7 +22,7 @@ jobs:
         with:
           source-directory: 'output'
           destination-github-username: sinryuji
-          destination-repository-name: tangyuling-frontend
+          destination-repository-name: clean-coast-frontend
           user-email: ${{ secrets.ACCOUNT_EMAIL }}
           commit-message: ${{ github.event.head_commit.message || 'Update from main branch' }}
           target-branch: main
